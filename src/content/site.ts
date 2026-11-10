@@ -12,7 +12,7 @@ export const site = {
   location: 'Menofia, Egypt · Remote',
   about:
     'Product engineer with 4+ years shipping TypeScript products on web, mobile and backend. I do my best work next to a founder. I find the product gap, decide how it should work, build it end to end and get it through App Store review.',
-  url: 'https://safty-portfolio-sigma.vercel.app',
+  url: 'https://mohamed-safty-portfolio.vercel.app',
   avatar: '/avatar.webp',
   cv: '/mohamed-safty-cv.pdf',
   links: [
