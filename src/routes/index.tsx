@@ -361,7 +361,7 @@ function Home() {
                   <span aria-hidden className="font-mono text-xs text-dim sm:pt-1">
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <blockquote className={index === 0 ? 'text-xl leading-snug' : 'leading-relaxed text-soft'}>
+                  <blockquote className="leading-relaxed text-soft transition-colors duration-300 group-hover:text-fg">
                     {quote}
                   </blockquote>
                 </div>
