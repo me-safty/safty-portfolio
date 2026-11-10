@@ -47,6 +47,7 @@ export const site = {
 export const testimonials = [
   'Mohamed is professional and great to work with. Excellent communication and the project was delivered quickly to a high standard. He answered all of my questions and was very helpful. I will definitely work with him again!',
   'It was a pleasure to work with him. He always took responsibility and knew how to read and solve issues in a fast and efficient way.',
+  'Working with Mohamed was a fantastic experience. He delivered exceptional results, demonstrating professionalism and expertise in his field. His timely and effective communication made the process smooth. Highly recommend for quality work!',
 ]
 
 export const stats = [
