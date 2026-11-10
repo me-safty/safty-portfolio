@@ -14,6 +14,12 @@ export const Route = createRootRoute({
       { name: 'theme-color', content: '#080808' },
       { title: `${site.name}, ${site.title}` },
       { name: 'description', content: site.about },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: site.name },
+      { property: 'og:title', content: `${site.name}, ${site.title}` },
+      { property: 'og:description', content: site.about },
+      { property: 'og:image', content: `${site.url}/og.png` },
+      { name: 'twitter:card', content: 'summary_large_image' },
     ],
     links: [
       { rel: 'stylesheet', href: styles },

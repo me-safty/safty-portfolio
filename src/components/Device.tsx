@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useState } from 'react'
 import type { Screen } from '../content/projects'
 
 export function Device({ screen, className = '' }: { screen: Screen; className?: string }) {
@@ -24,12 +25,23 @@ export function Device({ screen, className = '' }: { screen: Screen; className?:
               alt={screen.alt}
               className="absolute inset-0 size-full object-cover object-top"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 0.4, delay: 0.3 } }}
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
             />
           </AnimatePresence>
         </div>
       </div>
     </div>
   )
+}
+
+export function DeviceReel({ screens, interval, className }: { screens: Screen[]; interval: number; className?: string }) {
+  const [turn, setTurn] = useState(0)
+  useEffect(() => {
+    const timer = setInterval(() => setTurn((current) => current + 1), interval)
+    return () => clearInterval(timer)
+  }, [interval])
+  const screen = screens[turn % screens.length]
+  return screen ? <Device screen={screen} className={className} /> : null
 }

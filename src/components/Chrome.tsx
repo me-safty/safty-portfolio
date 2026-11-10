@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { motion, useSpring } from 'motion/react'
 import { type PointerEvent, useEffect, useState } from 'react'
 import { site } from '../content/site'
+import { DotMatrix, contactScenes } from './DotMatrix'
 import { Reveal, SectionLabel } from './Reveal'
 
 const navLink = 'transition-colors hover:text-fg'
@@ -34,16 +35,19 @@ function ThemeToggle() {
 export function Header() {
   return (
     <header className="flex items-center justify-between gap-4 pt-10 sm:pt-16">
-      <Link to="/" className="flex items-center gap-3">
+      <Link to="/" className="group flex items-center gap-3">
         <span
           data-lit
           suppressHydrationWarning
-          className="relative grid size-11 shrink-0 place-items-center rounded-full border border-fg/45 text-[13px] font-semibold"
+          className="relative size-11 shrink-0 overflow-hidden rounded-full border border-fg/45"
         >
-          {site.initials}
-          <span aria-hidden className="lit-mask absolute -inset-px grid place-items-center rounded-full bg-fg text-bg">
-            {site.initials}
-          </span>
+          <img src={site.avatar} alt="" className="size-full object-cover grayscale" />
+          <img
+            aria-hidden
+            alt=""
+            src={site.avatar}
+            className="lit-mask absolute inset-0 size-full object-cover group-hover:[mask-image:none]"
+          />
         </span>
         <span>
           <span className="block text-[15px] font-semibold">{site.name}</span>
@@ -89,6 +93,9 @@ export function Contact() {
 
   return (
     <footer id="contact" className="pt-20 pb-10">
+      <Reveal className="-mx-6 mb-10 sm:-mx-12">
+        <DotMatrix scenes={contactScenes} />
+      </Reveal>
       <SectionLabel>Contact</SectionLabel>
       <Reveal>
         <p className="mt-4 text-xl leading-snug text-soft">
@@ -102,9 +109,10 @@ export function Contact() {
             x.set(0)
             y.set(0)
           }}
-          className="group mt-6 inline-block text-[clamp(1.3rem,5.6vw,2.25rem)] font-semibold tracking-[-0.03em]"
+          className="group mt-6 inline-block text-[clamp(1.9rem,7vw,2.75rem)] font-semibold tracking-[-0.03em]"
         >
-          {site.email}
+          Email me{' '}
+          <span className="inline-block transition-transform duration-300 group-hover:translate-x-2">→</span>
           <span className="mt-1 block h-px origin-left scale-x-0 bg-fg transition-transform duration-500 group-hover:scale-x-100" />
         </motion.a>
       </Reveal>
@@ -115,15 +123,6 @@ export function Contact() {
         <span>
           {site.location} · <LocalTime />
         </span>
-        {site.links.length > 0 && (
-          <span className="flex gap-5">
-            {site.links.map((link) => (
-              <a key={link.label} href={link.href} target="_blank" rel="noreferrer" className={navLink}>
-                {link.label}
-              </a>
-            ))}
-          </span>
-        )}
       </div>
     </footer>
   )

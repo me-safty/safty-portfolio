@@ -1,8 +1,9 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
 import { motion } from 'motion/react'
-import { Device } from '../components/Device'
+import { useRef, useState } from 'react'
+import { DeviceReel } from '../components/Device'
 import { Reveal, SectionLabel } from '../components/Reveal'
-import { periodLabel, projects } from '../content/projects'
+import { type Screen, periodLabel, projects } from '../content/projects'
 import { site } from '../content/site'
 
 export const Route = createFileRoute('/work/$slug')({
@@ -18,16 +19,43 @@ export const Route = createFileRoute('/work/$slug')({
       ? [
           { title: `${loaderData.project.name} · ${site.name}` },
           { name: 'description', content: loaderData.project.summary },
+          { property: 'og:title', content: `${loaderData.project.name} · ${site.name}` },
+          { property: 'og:description', content: loaderData.project.summary },
         ]
       : [],
   }),
   component: CaseStudy,
 })
 
+function Shot({ screen, className, onZoom }: { screen: Screen; className: string; onZoom: (screen: Screen) => void }) {
+  return (
+    <Reveal>
+      <button
+        type="button"
+        onClick={() => onZoom(screen)}
+        className="block w-full cursor-zoom-in transition-transform duration-300 hover:-translate-y-1"
+      >
+        <img
+          src={screen.src}
+          alt={screen.alt}
+          loading="lazy"
+          className={`w-full border border-line object-cover object-top ${className}`}
+        />
+      </button>
+    </Reveal>
+  )
+}
+
 function CaseStudy() {
   const { project, next } = Route.useLoaderData()
   const phones = project.screens.filter((screen) => screen.shape === 'phone')
   const desktops = project.screens.filter((screen) => screen.shape === 'browser')
+  const lightbox = useRef<HTMLDialogElement>(null)
+  const [zoomed, setZoomed] = useState<Screen>()
+  const zoom = (screen: Screen) => {
+    setZoomed(screen)
+    lightbox.current?.showModal()
+  }
 
   return (
     <article className="pt-10">
@@ -56,50 +84,42 @@ function CaseStudy() {
         </div>
         <div>
           <dt className="font-mono text-[11px] tracking-[0.2em] text-dim uppercase">Period</dt>
-          <dd className="mt-1.5">{periodLabel(project.start)}</dd>
+          <dd className="mt-1.5">{periodLabel(project.start, project.end)}</dd>
         </div>
       </dl>
 
       <Reveal className="mt-10 grid place-items-center rounded-xl border border-line bg-panel py-10">
-        <Device screen={project.screens[0]} className="sm:[--u:3px]" />
+        <DeviceReel
+          key={project.slug}
+          screens={project.screens[0].shape === 'phone' ? phones : desktops}
+          interval={2800}
+          className="sm:[--u:3px]"
+        />
       </Reveal>
 
       <p className="mt-10 text-xl leading-snug">{project.summary}</p>
-      <ul className="mt-8 border-t border-line text-[15px]">
-        {project.facts.map((fact) => (
-          <li key={fact} className="border-b border-line py-3 text-soft">
-            {fact}
-          </li>
+      <div className="mt-8 grid border-t border-l border-line sm:grid-cols-3">
+        {project.facts.map((fact, index) => (
+          <Reveal key={fact.label} delay={index * 0.06} className="border-r border-b border-line p-4">
+            <div className="text-4xl font-semibold tracking-[-0.05em]">{fact.value}</div>
+            <p className="mt-3 text-xs leading-relaxed text-dim">{fact.label}</p>
+          </Reveal>
         ))}
-      </ul>
+      </div>
 
       <section className="mt-16">
         <SectionLabel>Screens</SectionLabel>
         {phones.length > 0 && (
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {phones.map((screen) => (
-              <Reveal key={screen.src}>
-                <img
-                  src={screen.src}
-                  alt={screen.alt}
-                  loading="lazy"
-                  className="aspect-[9/19] w-full rounded-xl border border-line object-cover object-top transition-transform duration-300 hover:-translate-y-1"
-                />
-              </Reveal>
+              <Shot key={screen.src} screen={screen} className="aspect-[9/19] rounded-xl" onZoom={zoom} />
             ))}
           </div>
         )}
         {desktops.length > 0 && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {desktops.map((screen) => (
-              <Reveal key={screen.src}>
-                <img
-                  src={screen.src}
-                  alt={screen.alt}
-                  loading="lazy"
-                  className="aspect-[16/10] w-full rounded-lg border border-line object-cover object-top transition-transform duration-300 hover:-translate-y-1"
-                />
-              </Reveal>
+              <Shot key={screen.src} screen={screen} className="aspect-[16/10] rounded-lg" onZoom={zoom} />
             ))}
           </div>
         )}
@@ -135,6 +155,14 @@ function CaseStudy() {
           <span className="transition-transform duration-300 group-hover:translate-x-2">→</span>
         </span>
       </Link>
+
+      <dialog
+        ref={lightbox}
+        onClick={() => lightbox.current?.close()}
+        className="m-auto cursor-zoom-out bg-transparent outline-none backdrop:bg-black/85 backdrop:backdrop-blur-sm"
+      >
+        {zoomed && <img src={zoomed.src} alt={zoomed.alt} className="max-h-[92svh] max-w-[92vw] rounded-xl" />}
+      </dialog>
     </article>
   )
 }

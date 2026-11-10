@@ -1,6 +1,8 @@
 const monthYear = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric', timeZone: 'UTC' })
 
-export const periodLabel = (start: string) => `${monthYear.format(new Date(`${start}-01`))} to Present`
+const monthLabel = (month: string) => monthYear.format(new Date(`${month}-01`))
+
+export const periodLabel = (start: string, end?: string) => `${monthLabel(start)} to ${end ? monthLabel(end) : 'Present'}`
 
 export type Screen = { src: string; shape: 'phone' | 'browser'; alt: string }
 
@@ -18,10 +20,11 @@ export type Project = {
   shortRole: string
   result: string
   start: string
+  end?: string
   accent: string
   screens: [Screen, ...Screen[]]
   summary: string
-  facts: string[]
+  facts: { value: string; label: string }[]
   sections: { title: string; items: { title: string; body: string }[] }[]
 }
 
@@ -49,9 +52,9 @@ const universeDawn: Project = {
   summary:
     "Universe Dawn is a sci-fi strategy MMO with a React desktop client, an Expo app for iOS, Android and mobile web, and Node.js microservices. I'm the main engineer, working directly with the founder, and I own the client apps and the API platform.",
   facts: [
-    '93 MRs merged in a 5-week mobile overhaul',
-    '10x merged output with the agent platform',
-    'Config check cut from 9 s to 0.7 s',
+    { value: '93', label: 'MRs merged in a 5-week mobile overhaul' },
+    { value: '10×', label: 'Merged output with the agent platform' },
+    { value: '0.7 s', label: 'Mobile config check, down from 9 s' },
   ],
   sections: [
     {
@@ -146,9 +149,9 @@ const pitchhub: Project = {
   summary:
     'PitchHub matches founders with angel investors through video pitches. I scoped the MVP with the founder and built it alone. It is live on the App Store and Google Play.',
   facts: [
-    'Live on the App Store and Google Play',
-    '6 tables, 21 RLS policies, 2 edge functions',
-    'v2 adds tiers and store-native billing',
+    { value: '2', label: 'Stores: live on the App Store and Google Play' },
+    { value: '21', label: 'RLS policies across 6 tables, with 2 edge functions' },
+    { value: 'v2', label: 'Adds tiers and store-native billing' },
   ],
   sections: [
     {
@@ -204,6 +207,7 @@ const meezan: Project = {
   shortRole: 'Lead frontend',
   result: '99 routes across 36 modules',
   start: '2025-08',
+  end: '2026-08',
   accent: '#e0b85a',
   screens: [
     screen('meezan', 'home', 'browser', 'Meezan dashboard with gold and silver prices'),
@@ -214,11 +218,11 @@ const meezan: Project = {
     screen('meezan', 'gold-conversions', 'browser', 'Gold conversions list'),
   ],
   summary:
-    "Meezan is an Arabic and English accounting and ERP dashboard for Saudi gold and jewelry shops. I own the frontend architecture, UX and visual design. The client's team owns the backend API.",
+    "Meezan is an Arabic and English accounting and ERP dashboard for Saudi gold and jewelry shops. I owned the frontend architecture, UX and visual design. The client's team owned the backend API.",
   facts: [
-    '99 routes across 36 feature modules',
-    'Arabic and English, full right-to-left',
-    'ZATCA e-invoicing per branch',
+    { value: '99', label: 'Routes across 36 feature modules' },
+    { value: 'RTL', label: 'Arabic and English, full right-to-left' },
+    { value: 'ZATCA', label: 'E-invoicing per branch' },
   ],
   sections: [
     {

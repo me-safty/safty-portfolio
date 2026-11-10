@@ -11,10 +11,11 @@ import {
   useTransform,
 } from 'motion/react'
 import { type PointerEvent, useEffect, useRef, useState } from 'react'
-import { Device } from '../components/Device'
+import { DeviceReel } from '../components/Device'
+import { DotMatrix, heroScenes } from '../components/DotMatrix'
 import { Reveal, SectionLabel } from '../components/Reveal'
 import { type Project, periodLabel, projects } from '../content/projects'
-import { site, skills, stats, upwork } from '../content/site'
+import { site, skills, stats, testimonials, upwork } from '../content/site'
 
 export const Route = createFileRoute('/')({ loader: () => ({ now: Date.now() }), component: Home })
 
@@ -46,17 +47,20 @@ function WorkList() {
   const [preview, setPreview] = useState<Project>()
   const x = useSpring(0, { stiffness: 320, damping: 32 })
   const y = useSpring(0, { stiffness: 320, damping: 32 })
-  const besideCursor = (event: PointerEvent) => Math.min(event.clientX + 28, innerWidth - 228)
+  const popupLeft = (event: PointerEvent) => {
+    const margin = event.currentTarget.getBoundingClientRect().right + 72
+    return margin + 220 <= innerWidth ? margin : Math.min(event.clientX + 28, innerWidth - 228)
+  }
 
   return (
     <div
       className="group/list mt-3"
       onPointerEnter={(event) => {
-        x.jump(besideCursor(event))
+        x.jump(popupLeft(event))
         y.jump(event.clientY)
       }}
       onPointerMove={(event) => {
-        x.set(besideCursor(event))
+        x.set(popupLeft(event))
         y.set(event.clientY)
       }}
       onPointerLeave={() => setPreview(undefined)}
@@ -96,7 +100,7 @@ function WorkList() {
             transition={{ duration: 0.18 }}
           >
             <div className="-translate-y-1/2">
-              <Device screen={preview.screens[0]} className="[--u:1.7px]" />
+              <DeviceReel key={preview.slug} screens={preview.screens.slice(0, 3)} interval={1500} className="[--u:1.7px]" />
             </div>
           </motion.div>
         )}
@@ -143,7 +147,15 @@ function CountUp({ value, decimals }: { value: number; decimals: number }) {
   return <motion.span ref={ref}>{text}</motion.span>
 }
 
-type Role = { role: string; place: string; highlight: string; start: string; accent: string; slug?: Project['slug'] }
+type Role = {
+  role: string
+  place: string
+  highlight: string
+  start: string
+  end?: string
+  accent: string
+  slug?: Project['slug']
+}
 
 const roles: Role[] = [
   ...projects.map((project) => ({
@@ -151,6 +163,7 @@ const roles: Role[] = [
     place: project.name,
     highlight: `${project.kind}. ${project.result}.`,
     start: project.start,
+    end: project.end,
     accent: project.accent,
     slug: project.slug,
   })),
@@ -158,11 +171,28 @@ const roles: Role[] = [
 ]
 
 const monthIndex = (date: Date) => date.getUTCFullYear() * 12 + date.getUTCMonth()
-const startMonth = (role: Role) => monthIndex(new Date(`${role.start}-01`))
-const duration = (months: number) => (months < 12 ? `${months} mo` : `${Math.floor(months / 12)} yr ${months % 12} mo`)
+const monthOf = (month: string) => monthIndex(new Date(`${month}-01`))
+const duration = (months: number) => {
+  const years = Math.floor(months / 12)
+  const rest = `${months % 12} mo`
+  if (!years) return rest
+  return months % 12 ? `${years} yr ${rest}` : `${years} yr`
+}
 const roll = 'block truncate transition-transform duration-300 group-hover:-translate-y-full'
 
-function RoleRow({ item, months, left, ticks }: { item: Role; months: number; left: number; ticks: number[] }) {
+function RoleRow({
+  item,
+  months,
+  left,
+  right,
+  ticks,
+}: {
+  item: Role
+  months: number
+  left: number
+  right: number
+  ticks: number[]
+}) {
   const elapsed = useMotionValue(months)
   const counted = useTransform(elapsed, (value) => duration(Math.round(value)))
   const className = `${row} grid gap-x-6 gap-y-2 py-3.5 sm:grid-cols-[1fr_11rem]`
@@ -181,7 +211,7 @@ function RoleRow({ item, months, left, ticks }: { item: Role; months: number; le
       </span>
       <span>
         <span className="block h-4 overflow-hidden font-mono text-xs leading-4 sm:text-right">
-          <span className={`${roll} text-dim`}>{periodLabel(item.start)}</span>
+          <span className={`${roll} text-dim`}>{periodLabel(item.start, item.end)}</span>
           <motion.span className={roll}>{counted}</motion.span>
         </span>
         <span className="relative mt-2 block h-1.5">
@@ -189,8 +219,8 @@ function RoleRow({ item, months, left, ticks }: { item: Role; months: number; le
             <i key={tick} className="absolute inset-y-0 w-px bg-line" style={{ left: `${tick}%` }} />
           ))}
           <span
-            className="absolute inset-y-0 right-0 overflow-hidden rounded-full border border-fg/30"
-            style={{ left: `${left}%` }}
+            className="absolute inset-y-0 overflow-hidden rounded-full border border-fg/30"
+            style={{ left: `${left}%`, right: `${right}%` }}
           >
             <span
               className="block h-full origin-left scale-x-0 transition-transform duration-500 ease-out group-hover:scale-x-100"
@@ -215,7 +245,7 @@ function RoleRow({ item, months, left, ticks }: { item: Role; months: number; le
 function Experience() {
   const { now } = Route.useLoaderData()
   const end = monthIndex(new Date(now))
-  const begin = Math.min(...roles.map(startMonth))
+  const begin = Math.min(...roles.map((role) => monthOf(role.start)))
   const position = (month: number) => ((month - begin) / (end - begin)) * 100
   const years = Array.from({ length: Math.floor(end / 12) - Math.floor(begin / 12) }, (_, index) => Math.floor(begin / 12) + index + 1)
 
@@ -233,18 +263,23 @@ function Experience() {
         </div>
       </div>
       <ul className="group/list mt-3">
-        {roles.map((item) => (
-          <li key={item.place} className="border-t border-line">
-            <Reveal>
-              <RoleRow
-                item={item}
-                months={end - startMonth(item)}
-                left={position(startMonth(item))}
-                ticks={years.map((year) => position(year * 12))}
-              />
-            </Reveal>
-          </li>
-        ))}
+        {roles.map((item) => {
+          const from = monthOf(item.start)
+          const to = item.end ? monthOf(item.end) : end
+          return (
+            <li key={item.place} className="border-t border-line">
+              <Reveal>
+                <RoleRow
+                  item={item}
+                  months={to - from}
+                  left={position(from)}
+                  right={100 - position(to)}
+                  ticks={years.map((year) => position(year * 12))}
+                />
+              </Reveal>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )
@@ -254,7 +289,10 @@ function Home() {
   return (
     <>
       <section className="pt-8">
-        <Reveal delay={0.1}>
+        <Reveal className="-mx-6 sm:-mx-12">
+          <DotMatrix scenes={heroScenes} />
+        </Reveal>
+        <Reveal delay={0.1} className="mt-7">
           <p className="text-[17px] leading-[1.65] text-soft">
             I build products next to founders, from the first scope to App Store review. I lead mobile and platform on{' '}
             <Link to="/work/$slug" params={{ slug: 'universe-dawn' }} className="link">
@@ -275,12 +313,25 @@ function Home() {
           <a href={`mailto:${site.email}`} className="btn">
             Email me
           </a>
-          <Link to="/" hash="work" className="btn btn-ghost">
-            See my work
-          </Link>
-          <span className="inline-flex items-center gap-2 rounded-full border border-line px-3 py-2 font-mono text-[11px] text-soft">
-            <span className="size-1.5 rounded-full bg-emerald-500" />
-            Top Rated on Upwork
+          <a href={site.cv} download className="btn btn-ghost">
+            Download CV
+          </a>
+          <span className="flex gap-1.5 sm:ml-auto">
+            {site.links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={link.label}
+                title={link.label}
+                className="grid size-9 place-items-center rounded-full border border-line text-soft transition-colors hover:border-fg hover:bg-fg hover:text-bg"
+              >
+                <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="currentColor">
+                  <path d={link.icon} />
+                </svg>
+              </a>
+            ))}
           </span>
         </Reveal>
       </section>
@@ -288,6 +339,36 @@ function Home() {
       <section id="work" className="pt-14">
         <SectionLabel>Work</SectionLabel>
         <WorkList />
+      </section>
+
+      <section id="clients" className="pt-14">
+        <div className="flex items-end justify-between">
+          <SectionLabel>Clients</SectionLabel>
+          <a
+            href={upwork.url}
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono text-[11px] text-dim transition-colors hover:text-fg"
+          >
+            Reviews on Upwork ↗
+          </a>
+        </div>
+        <ul className="group/list mt-3">
+          {testimonials.map((quote, index) => (
+            <li key={quote} className="border-t border-line">
+              <Reveal>
+                <div className={`${row} grid gap-x-5 gap-y-1.5 py-5 sm:grid-cols-[2rem_1fr]`}>
+                  <span aria-hidden className="font-mono text-xs text-dim sm:pt-1">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <blockquote className={index === 0 ? 'text-xl leading-snug' : 'leading-relaxed text-soft'}>
+                    {quote}
+                  </blockquote>
+                </div>
+              </Reveal>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <Experience />

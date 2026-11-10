@@ -6,7 +6,9 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    tanstackStart({ prerender: { enabled: true, crawlLinks: true } }),
+    tanstackStart({
+      prerender: { enabled: true, crawlLinks: true, filter: ({ path }) => !path.endsWith('.pdf') },
+    }),
     viteReact(),
   ],
 })
