@@ -144,13 +144,17 @@ function Home() {
         <Reveal className="-mx-6 sm:-mx-12">
           <DotMatrix scenes={heroScenes} />
         </Reveal>
-        <Reveal delay={0.1} className="mt-7">
-          <p className="text-[17px] leading-[1.65] text-soft">
-            I build products next to founders, from the first scope to App Store review. I lead mobile and platform on{' '}
+        <Reveal delay={0.1} className="mt-7 space-y-4 text-[17px] leading-[1.65] text-soft">
+          <p>
+            I'm a product engineer with 4+ years of shipping TypeScript products on web, mobile and backend. I work next
+            to founders: I find the product gap, decide how it should work, build it and get it through App Store review.
+          </p>
+          <p>
+            Right now I lead mobile and platform on{' '}
             <Link to="/work/$slug" params={{ slug: 'universe-dawn' }} className="link">
               Universe Dawn
             </Link>
-            , and I built{' '}
+            . I also built{' '}
             <Link to="/work/$slug" params={{ slug: 'pitchhub' }} className="link">
               PitchHub
             </Link>{' '}
