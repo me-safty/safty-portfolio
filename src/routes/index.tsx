@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   AnimatePresence,
+  type MotionValue,
   animate,
   motion,
   useInView,
@@ -9,7 +10,7 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react'
-import { type PointerEvent, type ReactNode, useEffect, useRef, useState } from 'react'
+import { type PointerEvent, useEffect, useRef, useState } from 'react'
 import { DeviceReel } from '../components/Device'
 import { DotMatrix, heroScenes } from '../components/DotMatrix'
 import { Reveal, SectionLabel } from '../components/Reveal'
@@ -56,9 +57,78 @@ function RowText({ name, note, period }: { name: string; note: string; period: s
   )
 }
 
-type Show = (project?: Project) => void
+function Popup({
+  project,
+  x,
+  y,
+  className,
+}: {
+  project: Project | undefined
+  x: MotionValue<number>
+  y: MotionValue<number>
+  className: string
+}) {
+  return (
+    <AnimatePresence>
+      {project && (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none fixed top-0 left-0 z-40"
+          style={{ x, y }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.18 }}
+        >
+          <div className={className}>
+            <DeviceReel key={project.slug} screens={project.screens.slice(0, 3)} interval={1500} className="[--u:1.7px]" />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
 
-function PreviewArea({ className, children }: { className?: string; children: (show: Show) => ReactNode }) {
+function Bio() {
+  const [preview, setPreview] = useState<Project>()
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const link = (project: Project) => (
+    <Link
+      to="/work/$slug"
+      params={{ slug: project.slug }}
+      onPointerEnter={(event) => {
+        if (event.pointerType !== 'mouse') return
+        const rect = event.currentTarget.getBoundingClientRect()
+        x.set(rect.left + rect.width / 2)
+        y.set(rect.top - 12)
+        setPreview(project)
+      }}
+      onPointerLeave={() => setPreview(undefined)}
+      className="link whitespace-nowrap"
+    >
+      {project.name}
+    </Link>
+  )
+
+  return (
+    <>
+      <Reveal delay={0.1} className="mt-7 space-y-4 text-[17px] leading-[1.65] text-soft">
+        <p>
+          I'm a product engineer with 4+ years of shipping TypeScript products on web, mobile and backend. I work next
+          to founders: I find the product gap, decide how it should work, build it and get it through App Store review.
+        </p>
+        <p>
+          Right now I lead mobile and platform on {link(universeDawn)}. I also built {link(pitchhub)} and the{' '}
+          {link(meezan)} frontend on my own.
+        </p>
+      </Reveal>
+      <Popup project={preview} x={x} y={y} className="-translate-x-1/2 -translate-y-full" />
+    </>
+  )
+}
+
+function WorkList() {
   const [preview, setPreview] = useState<Project>()
   const x = useSpring(0, { stiffness: 320, damping: 32 })
   const y = useSpring(0, { stiffness: 320, damping: 32 })
@@ -69,7 +139,7 @@ function PreviewArea({ className, children }: { className?: string; children: (s
 
   return (
     <div
-      className={className}
+      className="group/list mt-2"
       onPointerEnter={(event) => {
         x.jump(popupLeft(event))
         y.jump(event.clientY)
@@ -80,87 +150,43 @@ function PreviewArea({ className, children }: { className?: string; children: (s
       }}
       onPointerLeave={() => setPreview(undefined)}
     >
-      {children(setPreview)}
-      <AnimatePresence>
-        {preview && (
-          <motion.div
-            aria-hidden
-            className="pointer-events-none fixed top-0 left-0 z-40"
-            style={{ x, y }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.18 }}
+      {projects.map((project, index) => (
+        <Reveal key={project.slug} delay={0.3 + index * 0.08}>
+          <Link
+            to="/work/$slug"
+            params={{ slug: project.slug }}
+            onPointerEnter={(event) => {
+              if (event.pointerType === 'mouse') setPreview(project)
+            }}
+            className={workRow}
           >
-            <div className="-translate-y-1/2">
-              <DeviceReel key={preview.slug} screens={preview.screens.slice(0, 3)} interval={1500} className="[--u:1.7px]" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <Thumb project={project} />
+            <RowText
+              name={project.name}
+              note={`${project.shortRole} · ${project.result}`}
+              period={years(project.start, project.end)}
+            />
+          </Link>
+        </Reveal>
+      ))}
+      <Reveal delay={0.3 + projects.length * 0.08}>
+        <a
+          href={upwork.url}
+          target="_blank"
+          rel="noreferrer"
+          onPointerEnter={() => setPreview(undefined)}
+          className={workRow}
+        >
+          <span className={thumb}>
+            <svg aria-hidden viewBox="0 0 24 24" className="size-5 text-soft" fill="currentColor">
+              <path d={upwork.icon} />
+            </svg>
+          </span>
+          <RowText name="Upwork ↗" note={`${upwork.shortRole} · ${upwork.result}`} period={years(upwork.start)} />
+        </a>
+      </Reveal>
+      <Popup project={preview} x={x} y={y} className="-translate-y-1/2" />
     </div>
-  )
-}
-
-const showOnHover = (show: Show, project: Project) => (event: PointerEvent) => {
-  if (event.pointerType === 'mouse') show(project)
-}
-
-function ProjectLink({ project, show }: { project: Project; show: Show }) {
-  return (
-    <Link
-      to="/work/$slug"
-      params={{ slug: project.slug }}
-      onPointerEnter={showOnHover(show, project)}
-      onPointerLeave={() => show(undefined)}
-      className="link"
-    >
-      {project.name}
-    </Link>
-  )
-}
-
-function WorkList() {
-  return (
-    <PreviewArea className="group/list mt-2">
-      {(show) => (
-        <>
-          {projects.map((project, index) => (
-            <Reveal key={project.slug} delay={0.3 + index * 0.08}>
-              <Link
-                to="/work/$slug"
-                params={{ slug: project.slug }}
-                onPointerEnter={showOnHover(show, project)}
-                className={workRow}
-              >
-                <Thumb project={project} />
-                <RowText
-                  name={project.name}
-                  note={`${project.shortRole} · ${project.result}`}
-                  period={years(project.start, project.end)}
-                />
-              </Link>
-            </Reveal>
-          ))}
-          <Reveal delay={0.3 + projects.length * 0.08}>
-            <a
-              href={upwork.url}
-              target="_blank"
-              rel="noreferrer"
-              onPointerEnter={() => show(undefined)}
-              className={workRow}
-            >
-              <span className={thumb}>
-                <svg aria-hidden viewBox="0 0 24 24" className="size-5 text-soft" fill="currentColor">
-                  <path d={upwork.icon} />
-                </svg>
-              </span>
-              <RowText name="Upwork ↗" note={`${upwork.shortRole} · ${upwork.result}`} period={years(upwork.start)} />
-            </a>
-          </Reveal>
-        </>
-      )}
-    </PreviewArea>
   )
 }
 
@@ -213,24 +239,7 @@ function Home() {
         <Reveal className="-mx-6 sm:-mx-12">
           <DotMatrix scenes={heroScenes} />
         </Reveal>
-        <Reveal delay={0.1} className="mt-7">
-          <PreviewArea className="space-y-4 text-[17px] leading-[1.65] text-soft">
-            {(show) => (
-              <>
-                <p>
-                  I'm a product engineer with 4+ years of shipping TypeScript products on web, mobile and backend. I
-                  work next to founders: I find the product gap, decide how it should work, build it and get it through
-                  App Store review.
-                </p>
-                <p>
-                  Right now I lead mobile and platform on <ProjectLink project={universeDawn} show={show} />. I also
-                  built <ProjectLink project={pitchhub} show={show} /> and the{' '}
-                  <ProjectLink project={meezan} show={show} /> frontend on my own.
-                </p>
-              </>
-            )}
-          </PreviewArea>
-        </Reveal>
+        <Bio />
         <Reveal delay={0.2} className="mt-6 flex flex-wrap items-center gap-2.5">
           <a href={`mailto:${site.email}`} className="btn">
             Email me
