@@ -10,7 +10,7 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react'
-import { type PointerEvent, useEffect, useRef, useState } from 'react'
+import { Fragment, type PointerEvent, type ReactNode, useEffect, useRef, useState } from 'react'
 import { DeviceReel } from '../components/Device'
 import { DotMatrix, heroScenes } from '../components/DotMatrix'
 import { Reveal, SectionLabel } from '../components/Reveal'
@@ -57,20 +57,24 @@ function RowText({ name, note, period }: { name: string; note: string; period: s
   )
 }
 
+const mailIcon =
+  'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z'
+const downloadIcon = 'M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z'
+
 function Popup({
-  project,
   x,
   y,
   className,
+  children,
 }: {
-  project: Project | undefined
   x: MotionValue<number>
   y: MotionValue<number>
   className: string
+  children: ReactNode
 }) {
   return (
     <AnimatePresence>
-      {project && (
+      {children && (
         <motion.div
           aria-hidden
           className="pointer-events-none fixed top-0 left-0 z-40"
@@ -80,33 +84,44 @@ function Popup({
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.18 }}
         >
-          <div className={className}>
-            <DeviceReel key={project.slug} screens={project.screens.slice(0, 3)} interval={1500} className="[--u:1.7px]" />
-          </div>
+          <div className={className}>{children}</div>
         </motion.div>
       )}
     </AnimatePresence>
   )
 }
 
+function ProjectReel({ project }: { project: Project }) {
+  return <DeviceReel key={project.slug} screens={project.screens.slice(0, 3)} interval={1500} className="[--u:1.7px]" />
+}
+
+function IconBox({ path }: { path: string }) {
+  return (
+    <span className="grid size-14 place-items-center rounded-2xl border border-fg/20 bg-panel text-fg shadow-xl shadow-black/30">
+      <svg aria-hidden viewBox="0 0 24 24" className="size-6" fill="currentColor">
+        <path d={path} />
+      </svg>
+    </span>
+  )
+}
+
 function Bio() {
-  const [preview, setPreview] = useState<Project>()
+  const [popup, setPopup] = useState<ReactNode>()
   const x = useMotionValue(0)
   const y = useMotionValue(0)
-  const link = (project: Project) => (
-    <Link
-      to="/work/$slug"
-      params={{ slug: project.slug }}
-      onPointerEnter={(event) => {
-        if (event.pointerType !== 'mouse') return
-        const rect = event.currentTarget.getBoundingClientRect()
-        x.set(rect.left + rect.width / 2)
-        y.set(rect.top - 12)
-        setPreview(project)
-      }}
-      onPointerLeave={() => setPreview(undefined)}
-      className="link whitespace-nowrap"
-    >
+  const hover = (content: ReactNode) => ({
+    onPointerEnter: (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return
+      const rect = event.currentTarget.getBoundingClientRect()
+      x.set(rect.left + rect.width / 2)
+      y.set(rect.top - 12)
+      setPopup(content)
+    },
+    onPointerLeave: () => setPopup(undefined),
+    className: 'link whitespace-nowrap',
+  })
+  const work = (project: Project) => (
+    <Link to="/work/$slug" params={{ slug: project.slug }} {...hover(<ProjectReel project={project} />)}>
       {project.name}
     </Link>
   )
@@ -119,11 +134,32 @@ function Bio() {
           to founders: I find the product gap, decide how it should work, build it and get it through App Store review.
         </p>
         <p>
-          Right now I lead mobile and platform on {link(universeDawn)}. I also built {link(pitchhub)} and the{' '}
-          {link(meezan)} frontend on my own.
+          Right now I lead mobile and platform on {work(universeDawn)}. I also built {work(pitchhub)} and the{' '}
+          {work(meezan)} frontend on my own.
+        </p>
+        <p>
+          <a href={`mailto:${site.email}`} {...hover(<IconBox path={mailIcon} />)}>
+            Email me
+          </a>{' '}
+          or{' '}
+          <a href={site.cv} download {...hover(<IconBox path={downloadIcon} />)}>
+            download my CV
+          </a>
+          . I'm also on{' '}
+          {site.links.map((link, index) => (
+            <Fragment key={link.label}>
+              {index > 0 && (index === site.links.length - 1 ? ' and ' : ', ')}
+              <a href={link.href} target="_blank" rel="noreferrer" {...hover(<IconBox path={link.icon} />)}>
+                {link.label}
+              </a>
+            </Fragment>
+          ))}
+          .
         </p>
       </Reveal>
-      <Popup project={preview} x={x} y={y} className="-translate-x-1/2 -translate-y-full" />
+      <Popup x={x} y={y} className="-translate-x-1/2 -translate-y-full">
+        {popup}
+      </Popup>
     </>
   )
 }
@@ -185,7 +221,9 @@ function WorkList() {
           <RowText name="Upwork ↗" note={`${upwork.shortRole} · ${upwork.result}`} period={years(upwork.start)} />
         </a>
       </Reveal>
-      <Popup project={preview} x={x} y={y} className="-translate-y-1/2" />
+      <Popup x={x} y={y} className="-translate-y-1/2">
+        {preview && <ProjectReel project={preview} />}
+      </Popup>
     </div>
   )
 }
@@ -240,31 +278,6 @@ function Home() {
           <DotMatrix scenes={heroScenes} />
         </Reveal>
         <Bio />
-        <Reveal delay={0.2} className="mt-6 flex flex-wrap items-center gap-2.5">
-          <a href={`mailto:${site.email}`} className="btn">
-            Email me
-          </a>
-          <a href={site.cv} download className="btn btn-ghost">
-            Download CV
-          </a>
-          <span className="flex gap-1.5 sm:ml-auto">
-            {site.links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={link.label}
-                title={link.label}
-                className="grid size-9 place-items-center rounded-full border border-line text-soft transition-colors hover:border-fg hover:bg-fg hover:text-bg"
-              >
-                <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="currentColor">
-                  <path d={link.icon} />
-                </svg>
-              </a>
-            ))}
-          </span>
-        </Reveal>
       </section>
 
       <section id="work" className="pt-16 sm:pt-24">

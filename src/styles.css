@@ -87,32 +87,6 @@
     mask-image: radial-gradient(circle 150px at var(--lx, -999px) var(--ly, -999px), #000 30%, transparent);
   }
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
-    background: var(--color-fg);
-    color: var(--color-bg);
-    padding: 0.6rem 1.05rem;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
-    transition:
-      opacity 0.2s,
-      box-shadow 0.2s;
-  }
-  .btn:hover {
-    opacity: 0.85;
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--color-fg);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-fg) 30%, transparent);
-  }
-  .btn-ghost:hover {
-    opacity: 1;
-    box-shadow: inset 0 0 0 1px var(--color-fg);
-  }
   .link {
     color: var(--color-fg);
     text-decoration: underline dotted color-mix(in srgb, var(--color-fg) 50%, transparent);
