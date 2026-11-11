@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-const ROWS = 25
+const ROWS = 27
 const SAMPLE = 6
 const REACH = 95
 const SCENE_MS = 2600
@@ -307,7 +307,7 @@ export function DotMatrix({ scenes }: { scenes: Scenes }) {
     <canvas
       ref={ref}
       aria-hidden
-      className="block h-[125px] w-full [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] sm:h-[220px]"
+      className="block h-[150px] w-full [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] sm:h-[264px]"
     />
   )
 }

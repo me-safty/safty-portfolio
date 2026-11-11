@@ -15,6 +15,16 @@
   --color-line: #ffffff1a;
   --color-panel: #0e0e0e;
 
+  --animate-hint: hint 1.4s ease-in-out infinite;
+  @keyframes hint {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    30% {
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {

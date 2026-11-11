@@ -263,4 +263,4 @@ const meezan: Project = {
   ],
 }
 
-export const projects: [Project, ...Project[]] = [universeDawn, pitchhub, meezan]
+export const projects: [Project, Project, Project] = [universeDawn, pitchhub, meezan]

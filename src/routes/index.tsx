@@ -1,6 +1,15 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { AnimatePresence, animate, motion, useInView, useMotionValue, useSpring, useTransform } from 'motion/react'
-import { type PointerEvent, useEffect, useRef, useState } from 'react'
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'motion/react'
+import { type PointerEvent, type ReactNode, useEffect, useRef, useState } from 'react'
 import { DeviceReel } from '../components/Device'
 import { DotMatrix, heroScenes } from '../components/DotMatrix'
 import { Reveal, SectionLabel } from '../components/Reveal'
@@ -8,6 +17,8 @@ import { type Project, projects } from '../content/projects'
 import { site, skills, stats, testimonials, upwork } from '../content/site'
 
 export const Route = createFileRoute('/')({ component: Home })
+
+const [universeDawn, pitchhub, meezan] = projects
 
 const row =
   'group -mx-3 rounded-lg px-3 transition duration-300 hover:bg-fg/[0.06] group-hover/list:opacity-40 hover:opacity-100!'
@@ -45,7 +56,9 @@ function RowText({ name, note, period }: { name: string; note: string; period: s
   )
 }
 
-function WorkList() {
+type Show = (project?: Project) => void
+
+function PreviewArea({ className, children }: { className?: string; children: (show: Show) => ReactNode }) {
   const [preview, setPreview] = useState<Project>()
   const x = useSpring(0, { stiffness: 320, damping: 32 })
   const y = useSpring(0, { stiffness: 320, damping: 32 })
@@ -56,7 +69,7 @@ function WorkList() {
 
   return (
     <div
-      className="group/list mt-2"
+      className={className}
       onPointerEnter={(event) => {
         x.jump(popupLeft(event))
         y.jump(event.clientY)
@@ -67,41 +80,7 @@ function WorkList() {
       }}
       onPointerLeave={() => setPreview(undefined)}
     >
-      {projects.map((project, index) => (
-        <Reveal key={project.slug} delay={0.3 + index * 0.08}>
-          <Link
-            to="/work/$slug"
-            params={{ slug: project.slug }}
-            onPointerEnter={(event) => {
-              if (event.pointerType === 'mouse') setPreview(project)
-            }}
-            className={workRow}
-          >
-            <Thumb project={project} />
-            <RowText
-              name={project.name}
-              note={`${project.shortRole} · ${project.result}`}
-              period={years(project.start, project.end)}
-            />
-          </Link>
-        </Reveal>
-      ))}
-      <Reveal delay={0.3 + projects.length * 0.08}>
-        <a
-          href={upwork.url}
-          target="_blank"
-          rel="noreferrer"
-          onPointerEnter={() => setPreview(undefined)}
-          className={workRow}
-        >
-          <span className={thumb}>
-            <svg aria-hidden viewBox="0 0 24 24" className="size-5 text-soft" fill="currentColor">
-              <path d={upwork.icon} />
-            </svg>
-          </span>
-          <RowText name="Upwork ↗" note={`${upwork.shortRole} · ${upwork.result}`} period={years(upwork.start)} />
-        </a>
-      </Reveal>
+      {children(setPreview)}
       <AnimatePresence>
         {preview && (
           <motion.div
@@ -120,6 +99,96 @@ function WorkList() {
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+const showOnHover = (show: Show, project: Project) => (event: PointerEvent) => {
+  if (event.pointerType === 'mouse') show(project)
+}
+
+function ProjectLink({ project, show }: { project: Project; show: Show }) {
+  return (
+    <Link
+      to="/work/$slug"
+      params={{ slug: project.slug }}
+      onPointerEnter={showOnHover(show, project)}
+      onPointerLeave={() => show(undefined)}
+      className="link"
+    >
+      {project.name}
+    </Link>
+  )
+}
+
+function WorkList() {
+  return (
+    <PreviewArea className="group/list mt-2">
+      {(show) => (
+        <>
+          {projects.map((project, index) => (
+            <Reveal key={project.slug} delay={0.3 + index * 0.08}>
+              <Link
+                to="/work/$slug"
+                params={{ slug: project.slug }}
+                onPointerEnter={showOnHover(show, project)}
+                className={workRow}
+              >
+                <Thumb project={project} />
+                <RowText
+                  name={project.name}
+                  note={`${project.shortRole} · ${project.result}`}
+                  period={years(project.start, project.end)}
+                />
+              </Link>
+            </Reveal>
+          ))}
+          <Reveal delay={0.3 + projects.length * 0.08}>
+            <a
+              href={upwork.url}
+              target="_blank"
+              rel="noreferrer"
+              onPointerEnter={() => show(undefined)}
+              className={workRow}
+            >
+              <span className={thumb}>
+                <svg aria-hidden viewBox="0 0 24 24" className="size-5 text-soft" fill="currentColor">
+                  <path d={upwork.icon} />
+                </svg>
+              </span>
+              <RowText name="Upwork ↗" note={`${upwork.shortRole} · ${upwork.result}`} period={years(upwork.start)} />
+            </a>
+          </Reveal>
+        </>
+      )}
+    </PreviewArea>
+  )
+}
+
+function ScrollHint() {
+  const { scrollY } = useScroll()
+  const opacity = useTransform(scrollY, [0, 140], [1, 0])
+  const pointerEvents = useTransform(scrollY, (top) => (top > 140 ? 'none' : 'auto'))
+  return (
+    <motion.div
+      className="pointer-events-none fixed inset-x-0 bottom-5 z-40 flex justify-center"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.4, duration: 0.6 }}
+    >
+      <motion.button
+        type="button"
+        style={{ opacity, pointerEvents }}
+        onClick={() => document.getElementById('work')?.scrollIntoView()}
+        className="flex cursor-pointer items-center gap-2.5 rounded-full border border-line bg-bg/75 py-1.5 pr-3 pl-3.5 font-mono text-[11px] text-soft backdrop-blur-md transition-colors hover:border-fg hover:text-fg"
+      >
+        Scroll
+        <span aria-hidden className="flex flex-col gap-[3px]">
+          {[0, 1, 2].map((dot) => (
+            <i key={dot} className="size-[3px] animate-hint rounded-full bg-current" style={{ animationDelay: `${dot * 0.18}s` }} />
+          ))}
+        </span>
+      </motion.button>
+    </motion.div>
   )
 }
 
@@ -144,26 +213,23 @@ function Home() {
         <Reveal className="-mx-6 sm:-mx-12">
           <DotMatrix scenes={heroScenes} />
         </Reveal>
-        <Reveal delay={0.1} className="mt-7 space-y-4 text-[17px] leading-[1.65] text-soft">
-          <p>
-            I'm a product engineer with 4+ years of shipping TypeScript products on web, mobile and backend. I work next
-            to founders: I find the product gap, decide how it should work, build it and get it through App Store review.
-          </p>
-          <p>
-            Right now I lead mobile and platform on{' '}
-            <Link to="/work/$slug" params={{ slug: 'universe-dawn' }} className="link">
-              Universe Dawn
-            </Link>
-            . I also built{' '}
-            <Link to="/work/$slug" params={{ slug: 'pitchhub' }} className="link">
-              PitchHub
-            </Link>{' '}
-            and the{' '}
-            <Link to="/work/$slug" params={{ slug: 'meezan' }} className="link">
-              Meezan
-            </Link>{' '}
-            frontend on my own.
-          </p>
+        <Reveal delay={0.1} className="mt-7">
+          <PreviewArea className="space-y-4 text-[17px] leading-[1.65] text-soft">
+            {(show) => (
+              <>
+                <p>
+                  I'm a product engineer with 4+ years of shipping TypeScript products on web, mobile and backend. I
+                  work next to founders: I find the product gap, decide how it should work, build it and get it through
+                  App Store review.
+                </p>
+                <p>
+                  Right now I lead mobile and platform on <ProjectLink project={universeDawn} show={show} />. I also
+                  built <ProjectLink project={pitchhub} show={show} /> and the{' '}
+                  <ProjectLink project={meezan} show={show} /> frontend on my own.
+                </p>
+              </>
+            )}
+          </PreviewArea>
         </Reveal>
         <Reveal delay={0.2} className="mt-6 flex flex-wrap items-center gap-2.5">
           <a href={`mailto:${site.email}`} className="btn">
@@ -248,6 +314,8 @@ function Home() {
           ))}
         </ul>
       </section>
+
+      <ScrollHint />
     </>
   )
 }
