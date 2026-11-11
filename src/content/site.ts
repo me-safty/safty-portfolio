@@ -53,7 +53,7 @@ export const testimonials = [
 
 export const stats = [
   { value: 10, decimals: 0, suffix: '×', label: 'Merged output after I built the AI-agent delivery platform' },
-  { value: 93, decimals: 0, suffix: '', label: 'MRs merged in a 5-week mobile overhaul' },
+  { value: 2, decimals: 0, suffix: '', label: 'Apps live on the App Store and Google Play: Universe Dawn and PitchHub' },
   { value: 4, decimals: 0, suffix: '+', label: 'Years shipping TypeScript products on web, mobile and backend' },
   { value: 5, decimals: 1, suffix: '', label: 'Upwork rating, 100% Job Success across 11 jobs' },
 ]

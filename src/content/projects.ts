@@ -34,7 +34,7 @@ const universeDawn: Project = {
   kind: 'Sci-fi strategy MMO',
   role: 'Lead Engineer, Mobile & Platform (contract), Team Parallax',
   shortRole: 'Lead engineer',
-  result: '93 MRs in a 5-week mobile overhaul',
+  result: 'Mobile app rebuilt to desktop parity',
   start: '2022-09',
   accent: '#8ea2ff',
   screens: [
@@ -52,7 +52,7 @@ const universeDawn: Project = {
   summary:
     "Universe Dawn is a sci-fi strategy MMO with a React desktop client, an Expo app for iOS, Android and mobile web, and Node.js microservices. I'm the main engineer, working directly with the founder, and I own the client apps and the API platform.",
   facts: [
-    { value: '93', label: 'MRs merged in a 5-week mobile overhaul' },
+    { value: '7', label: 'Game areas brought to desktop parity on mobile' },
     { value: '10×', label: 'Merged output with the agent platform' },
     { value: '0.7 s', label: 'Mobile config check, down from 9 s' },
   ],
@@ -87,7 +87,7 @@ const universeDawn: Project = {
       items: [
         {
           title: 'Mobile overhaul',
-          body: 'Five weeks, 93 MRs merged through one integration branch. Fights, fleets, shipyard, chat, quests, the academy and premium reached desktop parity, with the screens redesigned for touch.',
+          body: '93 MRs merged through one integration branch. Fights, fleets, shipyard, chat, quests, the academy and premium reached desktop parity, with the screens redesigned for touch.',
         },
         {
           title: 'Navigation',
