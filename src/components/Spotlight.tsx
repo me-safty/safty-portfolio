@@ -14,18 +14,11 @@ export function Spotlight() {
       root.style.setProperty('--mx', `${x}px`)
       root.style.setProperty('--my', `${y}px`)
       root.style.setProperty('--sy', `${scrollY * -0.15}px`)
-      // These inline variables can land before React hydrates the element, so [data-lit] and [data-near] elements set suppressHydrationWarning.
+      // These inline variables can land before React hydrates the element, so [data-lit] elements set suppressHydrationWarning.
       for (const element of document.querySelectorAll<HTMLElement>('[data-lit]')) {
         const rect = element.getBoundingClientRect()
         element.style.setProperty('--lx', `${x - rect.left}px`)
         element.style.setProperty('--ly', `${y - rect.top}px`)
-      }
-      for (const element of document.querySelectorAll<HTMLElement>('[data-near]')) {
-        const rect = element.getBoundingClientRect()
-        const distance = Math.hypot(x - rect.left - rect.width / 2, y - rect.top - rect.height / 2)
-        const near = Math.max(0, 1 - distance / 130)
-        element.style.setProperty('--near', near.toFixed(3))
-        element.style.setProperty('--fill', near > 0.5 ? '1' : '0')
       }
     }
     const schedule = () => {

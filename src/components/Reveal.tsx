@@ -16,5 +16,5 @@ export function Reveal({ children, className, delay = 0 }: { children: ReactNode
 }
 
 export function SectionLabel({ children }: { children: ReactNode }) {
-  return <h2 className="font-mono text-[11px] tracking-[0.2em] text-dim uppercase">{children}</h2>
+  return <h2 className="text-sm text-dim">{children}</h2>
 }

@@ -58,8 +58,8 @@ export function Header() {
         <Link to="/" hash="work" className={`${navLink} max-sm:hidden`}>
           Work
         </Link>
-        <Link to="/" hash="about" className={`${navLink} max-sm:hidden`}>
-          About
+        <Link to="/" hash="clients" className={`${navLink} max-sm:hidden`}>
+          Clients
         </Link>
         <a href="#contact" className={navLink}>
           Email
@@ -92,7 +92,7 @@ export function Contact() {
   }
 
   return (
-    <footer id="contact" className="pt-20 pb-10">
+    <footer id="contact" className="pt-16 pb-10 sm:pt-24">
       <Reveal className="-mx-6 mb-10 sm:-mx-12">
         <DotMatrix scenes={contactScenes} />
       </Reveal>
@@ -116,7 +116,7 @@ export function Contact() {
           <span className="mt-1 block h-px origin-left scale-x-0 bg-fg transition-transform duration-500 group-hover:scale-x-100" />
         </motion.a>
       </Reveal>
-      <div className="mt-16 flex flex-wrap justify-between gap-x-8 gap-y-2 border-t border-line pt-5 font-mono text-[11px] text-dim">
+      <div className="mt-16 flex flex-wrap justify-between gap-x-8 gap-y-2 font-mono text-[11px] text-dim">
         <span>
           © {new Date().getFullYear()} {site.name}
         </span>

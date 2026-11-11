@@ -113,20 +113,6 @@
     text-decoration-color: var(--color-fg);
   }
 
-  .pill {
-    border: 1px solid var(--color-line);
-    border-radius: 999px;
-    padding: 0.2rem 0.7rem;
-    font-size: 0.8125rem;
-    color: color-mix(in srgb, var(--color-bg) calc(var(--fill, 0) * 100%), var(--color-soft));
-    background: color-mix(in srgb, var(--color-fg) calc(var(--fill, 0) * 100%), transparent);
-    transform: translateY(calc(var(--near, 0) * -4px)) scale(calc(1 + var(--near, 0) * 0.14));
-    transition:
-      transform 0.25s ease-out,
-      background-color 0.25s,
-      color 0.25s;
-  }
-
   .device {
     --u: 2.3px;
     width: calc(var(--u) * var(--w));

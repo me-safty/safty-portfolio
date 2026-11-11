@@ -79,11 +79,11 @@ function CaseStudy() {
       </h1>
       <dl className="mt-9 grid gap-x-10 gap-y-5 text-[15px] sm:grid-cols-[1.5fr_1fr]">
         <div>
-          <dt className="font-mono text-[11px] tracking-[0.2em] text-dim uppercase">Role</dt>
+          <dt className="text-sm text-dim">Role</dt>
           <dd className="mt-1.5">{project.role}</dd>
         </div>
         <div>
-          <dt className="font-mono text-[11px] tracking-[0.2em] text-dim uppercase">Period</dt>
+          <dt className="text-sm text-dim">Period</dt>
           <dd className="mt-1.5">{periodLabel(project.start, project.end)}</dd>
         </div>
       </dl>
@@ -98,16 +98,16 @@ function CaseStudy() {
       </Reveal>
 
       <p className="mt-10 text-xl leading-snug">{project.summary}</p>
-      <div className="mt-8 grid border-t border-l border-line sm:grid-cols-3">
+      <div className="mt-10 grid gap-8 sm:grid-cols-3">
         {project.facts.map((fact, index) => (
-          <Reveal key={fact.label} delay={index * 0.06} className="border-r border-b border-line p-4">
+          <Reveal key={fact.label} delay={index * 0.06}>
             <div className="text-4xl font-semibold tracking-[-0.05em]">{fact.value}</div>
-            <p className="mt-3 text-xs leading-relaxed text-dim">{fact.label}</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-dim">{fact.label}</p>
           </Reveal>
         ))}
       </div>
 
-      <section className="mt-16">
+      <section className="mt-20">
         <SectionLabel>Screens</SectionLabel>
         {phones.length > 0 && (
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -126,17 +126,14 @@ function CaseStudy() {
       </section>
 
       {project.sections.map((section) => (
-        <section key={section.title} className="mt-16">
+        <section key={section.title} className="mt-20">
           <SectionLabel>{section.title}</SectionLabel>
-          <ol className="mt-4 border-t border-line">
-            {section.items.map((item, index) => (
-              <li key={item.title} className="border-b border-line">
-                <Reveal className="grid gap-x-5 gap-y-1.5 py-6 sm:grid-cols-[2rem_1fr]">
-                  <span className="font-mono text-xs text-dim sm:pt-1">{String(index + 1).padStart(2, '0')}</span>
-                  <div>
-                    <h3 className="text-[17px] font-semibold tracking-tight">{item.title}</h3>
-                    <p className="mt-1.5 leading-relaxed text-soft">{item.body}</p>
-                  </div>
+          <ol className="mt-5 space-y-7">
+            {section.items.map((item) => (
+              <li key={item.title}>
+                <Reveal>
+                  <h3 className="text-[17px] font-semibold tracking-tight">{item.title}</h3>
+                  <p className="mt-1.5 leading-relaxed text-soft">{item.body}</p>
                 </Reveal>
               </li>
             ))}
@@ -149,7 +146,7 @@ function CaseStudy() {
         params={{ slug: next.slug }}
         className="group -mx-3 mt-16 block rounded-lg px-3 py-5 transition-colors hover:bg-fg/[0.06]"
       >
-        <span className="font-mono text-[11px] tracking-[0.2em] text-dim uppercase">Next</span>
+        <span className="text-sm text-dim">Next</span>
         <span className="mt-2 flex items-baseline justify-between gap-6 text-3xl font-semibold tracking-[-0.04em]">
           {next.name}
           <span className="transition-transform duration-300 group-hover:translate-x-2">→</span>
