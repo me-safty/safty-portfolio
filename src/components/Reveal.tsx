@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
+import { type GlyphName, SectionGlyph } from './Tiles'
 
 export function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   return (
@@ -15,6 +16,11 @@ export function Reveal({ children, className, delay = 0 }: { children: ReactNode
   )
 }
 
-export function SectionLabel({ children }: { children: ReactNode }) {
-  return <h2 className="text-sm text-dim">{children}</h2>
+export function SectionLabel({ children, glyph }: { children: ReactNode; glyph?: GlyphName }) {
+  return (
+    <h2 className="flex items-center gap-2.5 text-sm text-dim">
+      {glyph && <SectionGlyph name={glyph} />}
+      {children}
+    </h2>
+  )
 }

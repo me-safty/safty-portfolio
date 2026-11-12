@@ -1,3 +1,5 @@
+import type { GraphicName } from '../components/Tiles'
+
 export const upwork = {
   shortRole: 'Freelance developer',
   result: 'Top Rated, 100% Job Success',
@@ -51,11 +53,11 @@ export const testimonials = [
   'Working with Mohamed was a fantastic experience. He delivered exceptional results, demonstrating professionalism and expertise in his field. His timely and effective communication made the process smooth. Highly recommend for quality work!',
 ]
 
-export const stats = [
-  { value: 10, decimals: 0, suffix: '×', label: 'Merged output after I built the AI-agent delivery platform' },
-  { value: 2, decimals: 0, suffix: '', label: 'Apps live on the App Store and Google Play: Universe Dawn and PitchHub' },
-  { value: 4, decimals: 0, suffix: '+', label: 'Years shipping TypeScript products on web, mobile and backend' },
-  { value: 5, decimals: 1, suffix: '', label: 'Upwork rating, 100% Job Success across 11 jobs' },
+export const stats: { value: number; decimals: number; suffix: string; graphic: GraphicName; label: string }[] = [
+  { value: 10, decimals: 0, suffix: '×', graphic: 'bars', label: 'Merged output after I built the AI-agent delivery platform' },
+  { value: 2, decimals: 0, suffix: '', graphic: 'phones', label: 'Apps live on the App Store and Google Play: Universe Dawn and PitchHub' },
+  { value: 4, decimals: 0, suffix: '+', graphic: 'years', label: 'Years shipping TypeScript products on web, mobile and backend' },
+  { value: 5, decimals: 1, suffix: '', graphic: 'stars', label: 'Upwork rating, 100% Job Success across 11 jobs' },
 ]
 
 export const skills = [

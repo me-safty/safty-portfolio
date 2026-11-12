@@ -30,9 +30,6 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --dot: rgb(255 255 255 / 0.1);
-    --dot-lit: rgb(255 255 255 / 0.9);
-    --glow: rgb(255 255 255 / 0.055);
   }
   html[data-theme='light'] {
     color-scheme: light;
@@ -42,9 +39,6 @@
     --color-dim: #6e6e69;
     --color-line: #0000001f;
     --color-panel: #ecece8;
-    --dot: rgb(0 0 0 / 0.16);
-    --dot-lit: rgb(0 0 0 / 0.85);
-    --glow: rgb(0 0 0 / 0.03);
   }
   html {
     background: var(--color-bg);
@@ -67,22 +61,6 @@
 }
 
 @layer components {
-  .dots {
-    background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.6px);
-    background-size: 22px 22px;
-    background-position: 0 var(--sy, 0px);
-  }
-  .dots-lit {
-    background-image: radial-gradient(circle, var(--dot-lit) 1.1px, transparent 1.7px);
-    mask-image: radial-gradient(circle 230px at var(--mx, -999px) var(--my, -999px), #000 12%, transparent);
-  }
-  .glow {
-    background: radial-gradient(
-      480px circle at var(--mx, -999px) var(--my, -999px),
-      var(--glow),
-      transparent 70%
-    );
-  }
   .lit-mask {
     mask-image: radial-gradient(circle 150px at var(--lx, -999px) var(--ly, -999px), #000 30%, transparent);
   }

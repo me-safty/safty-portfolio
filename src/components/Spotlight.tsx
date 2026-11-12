@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 
 export function Spotlight() {
   useEffect(() => {
-    const root = document.documentElement
     let x = innerWidth * 0.74
     let y = innerHeight * 0.3
     let frame = 0
@@ -11,9 +10,6 @@ export function Spotlight() {
 
     const paint = () => {
       frame = 0
-      root.style.setProperty('--mx', `${x}px`)
-      root.style.setProperty('--my', `${y}px`)
-      root.style.setProperty('--sy', `${scrollY * -0.15}px`)
       // These inline variables can land before React hydrates the element, so [data-lit] elements set suppressHydrationWarning.
       for (const element of document.querySelectorAll<HTMLElement>('[data-lit]')) {
         const rect = element.getBoundingClientRect()
@@ -58,11 +54,5 @@ export function Spotlight() {
     }
   }, [])
 
-  return (
-    <div aria-hidden className="pointer-events-none">
-      <div className="dots fixed inset-0 -z-10" />
-      <div className="dots dots-lit fixed inset-0 -z-10" />
-      <div className="glow fixed inset-0 z-30" />
-    </div>
-  )
+  return null
 }

@@ -15,6 +15,7 @@ import { DeviceReel } from '../components/Device'
 import { Orbit } from '../components/Orbit'
 import { ThemeToggle } from '../components/Chrome'
 import { Reveal, SectionLabel } from '../components/Reveal'
+import { StatGraphic, WorkThumb } from '../components/Tiles'
 import { type Project, projects } from '../content/projects'
 import { site, skills, stats, testimonials, upwork } from '../content/site'
 
@@ -26,25 +27,8 @@ const row =
   'group -mx-3 rounded-lg px-3 transition duration-300 hover:bg-fg/[0.06] group-hover/list:opacity-40 hover:opacity-100!'
 
 const workRow = `${row} grid grid-cols-[4rem_1fr_auto] items-center gap-4 py-3`
-const thumb = 'relative grid h-12 w-16 place-items-center overflow-hidden rounded-md border border-line'
+const thumb = 'h-12 w-16 rounded-md ring-1 ring-line'
 const years = (start: string, end?: string) => `${start.slice(0, 4)} – ${end?.slice(0, 4) ?? 'now'}`
-
-function Thumb({ project }: { project: Project }) {
-  const frame = project.screens[0].shape === 'phone' ? 'h-8 w-[18px] rounded-[5px]' : 'h-7 w-11 rounded-[4px]'
-  return (
-    <span data-lit suppressHydrationWarning className={thumb}>
-      <span className={`border border-fg/50 p-[3px] ${frame}`}>
-        <span className="block h-full rounded-[2px] border border-fg/30" />
-      </span>
-      <img
-        aria-hidden
-        alt=""
-        src={project.screens[0].src}
-        className="lit-mask absolute inset-0 size-full object-cover object-[50%_22%] group-hover:[mask-image:none]"
-      />
-    </span>
-  )
-}
 
 function RowText({ name, note, period }: { name: string; note: string; period: string }) {
   return (
@@ -58,8 +42,6 @@ function RowText({ name, note, period }: { name: string; note: string; period: s
   )
 }
 
-const mailIcon =
-  'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z'
 const downloadIcon = 'M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z'
 const rowLink = 'transition-colors hover:text-fg'
 
@@ -136,15 +118,8 @@ function Bio() {
           to founders: I find the product gap, decide how it should work, build it and get it through App Store review.
         </p>
         <p>
-          Right now I lead mobile and platform on {work(universeDawn)}. I also built {work(pitchhub)} and the{' '}
-          {work(meezan)} frontend on my own.
-        </p>
-        <p>
-          You can reach me at{' '}
-          <a href={`mailto:${site.email}`} {...hover(<IconBox path={mailIcon} />)}>
-            {site.email}
-          </a>
-          .
+          Right now I lead mobile and platform on {work(universeDawn)}. I also built {work(pitchhub)} and{' '}
+          {work(meezan)}.
         </p>
       </Reveal>
       <Reveal delay={0.1} className="mt-8">
@@ -209,7 +184,7 @@ function WorkList() {
             }}
             className={workRow}
           >
-            <Thumb project={project} />
+            <WorkThumb slug={project.slug} className={thumb} />
             <RowText
               name={project.name}
               note={`${project.shortRole} · ${project.result}`}
@@ -226,7 +201,7 @@ function WorkList() {
           onPointerEnter={() => setPreview(undefined)}
           className={workRow}
         >
-          <span className={thumb}>
+          <span className={`${thumb} grid place-items-center`}>
             <svg aria-hidden viewBox="0 0 24 24" className="size-5 text-soft" fill="currentColor">
               <path d={upwork.icon} />
             </svg>
@@ -269,18 +244,27 @@ function ScrollHint() {
   )
 }
 
-function CountUp({ value, decimals }: { value: number; decimals: number }) {
-  const ref = useRef<HTMLSpanElement>(null)
+function Stat({ stat }: { stat: (typeof stats)[number] }) {
+  const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true })
-  const count = useMotionValue(value)
-  const text = useTransform(count, (current) => current.toFixed(decimals))
+  const progress = useMotionValue(1)
+  const text = useTransform(progress, (done) => (done * stat.value).toFixed(stat.decimals))
   useEffect(() => {
     if (!inView) return
-    count.set(0)
-    const controls = animate(count, value, { duration: 1.4, ease: [0.2, 0.7, 0.1, 1] })
+    progress.set(0)
+    const controls = animate(progress, 1, { duration: 1.8, delay: 0.25, ease: 'easeInOut' })
     return () => controls.stop()
-  }, [inView, count, value])
-  return <motion.span ref={ref}>{text}</motion.span>
+  }, [inView, progress])
+  return (
+    <div ref={ref}>
+      <StatGraphic name={stat.graphic} progress={progress} />
+      <div className="mt-4 text-4xl font-semibold tracking-[-0.05em]">
+        <motion.span>{text}</motion.span>
+        {stat.suffix}
+      </div>
+      <p className="mt-2 text-[13px] leading-relaxed text-dim">{stat.label}</p>
+    </div>
+  )
 }
 
 function Home() {
@@ -291,28 +275,24 @@ function Home() {
       </section>
 
       <section id="work" className="pt-16 sm:pt-24">
-        <SectionLabel>Work</SectionLabel>
+        <SectionLabel glyph="work">Work</SectionLabel>
         <WorkList />
       </section>
 
       <section id="numbers" className="pt-16 sm:pt-24">
-        <SectionLabel>Numbers</SectionLabel>
+        <SectionLabel glyph="numbers">Numbers</SectionLabel>
         <div className="mt-5 grid grid-cols-2 gap-8 sm:grid-cols-4">
           {stats.map((stat, index) => (
             <Reveal key={stat.label} delay={index * 0.06}>
-              <div className="text-4xl font-semibold tracking-[-0.05em]">
-                <CountUp value={stat.value} decimals={stat.decimals} />
-                {stat.suffix}
-              </div>
-              <p className="mt-2 text-[13px] leading-relaxed text-dim">{stat.label}</p>
+              <Stat stat={stat} />
             </Reveal>
           ))}
         </div>
       </section>
 
       <section id="clients" className="pt-16 sm:pt-24">
-        <div className="flex items-baseline justify-between">
-          <SectionLabel>Clients</SectionLabel>
+        <div className="flex items-center justify-between">
+          <SectionLabel glyph="clients">Clients</SectionLabel>
           <a
             href={upwork.url}
             target="_blank"
@@ -334,7 +314,7 @@ function Home() {
       </section>
 
       <section id="skills" className="pt-16 sm:pt-24">
-        <SectionLabel>Skills</SectionLabel>
+        <SectionLabel glyph="skills">Skills</SectionLabel>
         <ul className="mt-5 space-y-4">
           {skills.map((group) => (
             <li key={group.title}>

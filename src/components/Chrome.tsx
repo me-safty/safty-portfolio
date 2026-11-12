@@ -2,8 +2,8 @@ import { Link } from '@tanstack/react-router'
 import { motion, useSpring } from 'motion/react'
 import { type PointerEvent, useEffect, useState } from 'react'
 import { site } from '../content/site'
-import { DotMatrix, contactScenes } from './DotMatrix'
 import { Reveal, SectionLabel } from './Reveal'
+import { Wordmark } from './Wordmark'
 
 const label = 'font-mono text-[11px] tracking-[0.14em] text-dim uppercase'
 
@@ -88,10 +88,7 @@ export function Contact() {
 
   return (
     <footer id="contact" className="pt-16 pb-10 sm:pt-24">
-      <Reveal className="-mx-6 mb-10 sm:-mx-12">
-        <DotMatrix scenes={contactScenes} />
-      </Reveal>
-      <SectionLabel>Contact</SectionLabel>
+      <SectionLabel glyph="contact">Contact</SectionLabel>
       <Reveal>
         <p className="mt-4 text-xl leading-snug text-soft">
           I do my best work next to a founder. If you have a product to scope, build or ship, write to me.
@@ -117,6 +114,9 @@ export function Contact() {
         </span>
         <ThemeToggle />
       </div>
+      <Reveal className="-mx-6 mt-10 sm:-mx-12">
+        <Wordmark />
+      </Reveal>
     </footer>
   )
 }
