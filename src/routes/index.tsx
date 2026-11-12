@@ -10,9 +10,10 @@ import {
   useSpring,
   useTransform,
 } from 'motion/react'
-import { Fragment, type PointerEvent, type ReactNode, useEffect, useRef, useState } from 'react'
+import { type PointerEvent, type ReactNode, useEffect, useRef, useState } from 'react'
 import { DeviceReel } from '../components/Device'
-import { DotMatrix, heroScenes } from '../components/DotMatrix'
+import { Orbit } from '../components/Orbit'
+import { ThemeToggle } from '../components/Chrome'
 import { Reveal, SectionLabel } from '../components/Reveal'
 import { type Project, projects } from '../content/projects'
 import { site, skills, stats, testimonials, upwork } from '../content/site'
@@ -60,6 +61,7 @@ function RowText({ name, note, period }: { name: string; note: string; period: s
 const mailIcon =
   'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z'
 const downloadIcon = 'M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z'
+const rowLink = 'transition-colors hover:text-fg'
 
 function Popup({
   x,
@@ -128,7 +130,7 @@ function Bio() {
 
   return (
     <>
-      <Reveal delay={0.1} className="mt-7 space-y-4 text-[17px] leading-[1.65] text-soft">
+      <Reveal className="space-y-5 font-mono text-sm leading-[1.8] text-soft">
         <p>
           I'm a product engineer with 4+ years of shipping TypeScript products on web, mobile and backend. I work next
           to founders: I find the product gap, decide how it should work, build it and get it through App Store review.
@@ -138,24 +140,35 @@ function Bio() {
           {work(meezan)} frontend on my own.
         </p>
         <p>
+          You can reach me at{' '}
           <a href={`mailto:${site.email}`} {...hover(<IconBox path={mailIcon} />)}>
-            Email me
-          </a>{' '}
-          or{' '}
-          <a href={site.cv} download {...hover(<IconBox path={downloadIcon} />)}>
-            download my CV
+            {site.email}
           </a>
-          . I'm also on{' '}
-          {site.links.map((link, index) => (
-            <Fragment key={link.label}>
-              {index > 0 && (index === site.links.length - 1 ? ' and ' : ', ')}
-              <a href={link.href} target="_blank" rel="noreferrer" {...hover(<IconBox path={link.icon} />)}>
-                {link.label}
-              </a>
-            </Fragment>
-          ))}
           .
         </p>
+      </Reveal>
+      <Reveal delay={0.1} className="mt-8">
+        <Orbit />
+      </Reveal>
+      <Reveal delay={0.2} className="mt-5 flex flex-wrap items-center justify-end gap-x-6 gap-y-3">
+        <span className="mr-auto flex flex-wrap gap-x-4 gap-y-2 font-mono text-[13px] text-soft sm:gap-x-5 sm:text-sm">
+          <a href={site.cv} download {...hover(<IconBox path={downloadIcon} />)} className={rowLink}>
+            cv
+          </a>
+          {site.links.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              {...hover(<IconBox path={link.icon} />)}
+              className={rowLink}
+            >
+              {link.label.toLowerCase()}
+            </a>
+          ))}
+        </span>
+        <ThemeToggle />
       </Reveal>
       <Popup x={x} y={y} className="-translate-x-1/2 -translate-y-full">
         {popup}
@@ -234,7 +247,7 @@ function ScrollHint() {
   const pointerEvents = useTransform(scrollY, (top) => (top > 140 ? 'none' : 'auto'))
   return (
     <motion.div
-      className="pointer-events-none fixed inset-x-0 bottom-5 z-40 flex justify-center"
+      className="pointer-events-none fixed inset-x-0 bottom-5 z-40 flex justify-center max-sm:hidden"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.4, duration: 0.6 }}
@@ -273,10 +286,7 @@ function CountUp({ value, decimals }: { value: number; decimals: number }) {
 function Home() {
   return (
     <>
-      <section className="pt-8">
-        <Reveal className="-mx-6 sm:-mx-12">
-          <DotMatrix scenes={heroScenes} />
-        </Reveal>
+      <section className="pt-10 sm:pt-12">
         <Bio />
       </section>
 

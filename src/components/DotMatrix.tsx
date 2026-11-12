@@ -25,57 +25,6 @@ type Dot = {
 }
 
 // Glyphs are drawn in grid cells: one unit is one dot.
-export const heroScenes: Scenes = [
-  {
-    word: 'MOBILE',
-    width: 11,
-    draw(pen, x, middle) {
-      pen.beginPath()
-      pen.roundRect(x + 1, middle - 8.5, 9, 17, 2)
-      pen.stroke()
-      pen.fillRect(x + 4, middle + 5.3, 3, 1.2)
-    },
-  },
-  {
-    word: 'WEB',
-    width: 21,
-    draw(pen, x, middle) {
-      pen.beginPath()
-      pen.roundRect(x + 0.5, middle - 7.5, 20, 15, 1.5)
-      pen.stroke()
-      pen.fillRect(x + 0.5, middle - 4, 20, 1.2)
-      pen.fillRect(x + 4, middle, 8, 1.2)
-      pen.fillRect(x + 4, middle + 3, 12, 1.2)
-    },
-  },
-  {
-    word: 'AI',
-    width: 19,
-    draw(pen, x, middle) {
-      const center = x + 9.5
-      pen.beginPath()
-      pen.moveTo(center, middle - 9.5)
-      pen.quadraticCurveTo(center + 1.5, middle - 1.5, center + 9.5, middle)
-      pen.quadraticCurveTo(center + 1.5, middle + 1.5, center, middle + 9.5)
-      pen.quadraticCurveTo(center - 1.5, middle + 1.5, center - 9.5, middle)
-      pen.quadraticCurveTo(center - 1.5, middle - 1.5, center, middle - 9.5)
-      pen.fill()
-    },
-  },
-  {
-    word: 'SHIPPED',
-    width: 17,
-    draw(pen, x, middle) {
-      pen.lineWidth = 2.4
-      pen.beginPath()
-      pen.moveTo(x + 1.5, middle + 0.5)
-      pen.lineTo(x + 6.5, middle + 5.5)
-      pen.lineTo(x + 15.5, middle - 6)
-      pen.stroke()
-    },
-  },
-]
-
 export const contactScenes: Scenes = [
   {
     word: 'SAY HI',

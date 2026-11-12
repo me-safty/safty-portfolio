@@ -10,7 +10,7 @@ export const site = {
   name: 'Mohamed Safty',
   title: 'Senior Product Engineer',
   email: 'me.a.safty@gmail.com',
-  location: 'Menofia, Egypt · Remote',
+  location: 'Menofia, Egypt ·\u00a0Remote',
   about:
     'Product engineer with 4+ years shipping TypeScript products on web, mobile and backend. I do my best work next to a founder. I find the product gap, decide how it should work, build it end to end and get it through App Store review.',
   url: 'https://mohamed-safty-portfolio.vercel.app',

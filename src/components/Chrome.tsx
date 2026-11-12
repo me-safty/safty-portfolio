@@ -5,9 +5,9 @@ import { site } from '../content/site'
 import { DotMatrix, contactScenes } from './DotMatrix'
 import { Reveal, SectionLabel } from './Reveal'
 
-const navLink = 'transition-colors hover:text-fg'
+const label = 'font-mono text-[11px] tracking-[0.14em] text-dim uppercase'
 
-function ThemeToggle() {
+export function ThemeToggle() {
   const toggle = () => {
     const root = document.documentElement
     const next = root.dataset.theme === 'light' ? 'dark' : 'light'
@@ -19,67 +19,62 @@ function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Switch between dark and light theme"
-      className="grid size-8 cursor-pointer place-items-center rounded-full border border-line transition-colors hover:border-fg hover:text-fg"
+      className="cursor-pointer font-mono text-xs text-dim transition-colors hover:text-fg"
     >
-      <svg viewBox="0 0 24 24" className="size-4 light:hidden" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" strokeLinecap="round" />
-      </svg>
-      <svg viewBox="0 0 24 24" className="hidden size-4 light:block" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" strokeLinejoin="round" />
-      </svg>
+      [ <span className="light:hidden">light</span>
+      <span className="hidden light:inline">dark</span> ]
     </button>
   )
 }
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between gap-4 pt-10 sm:pt-16">
-      <Link to="/" className="group flex items-center gap-3">
-        <span
-          data-lit
-          suppressHydrationWarning
-          className="relative size-11 shrink-0 overflow-hidden rounded-full border border-fg/45"
-        >
-          <img src={site.avatar} alt="" className="size-full object-cover grayscale" />
-          <img
-            aria-hidden
-            alt=""
-            src={site.avatar}
-            className="lit-mask absolute inset-0 size-full object-cover group-hover:[mask-image:none]"
-          />
-        </span>
-        <span>
-          <span className="block text-[15px] font-semibold">{site.name}</span>
-          <span className="block text-[13px] text-dim">{site.title}</span>
+    <header className="flex items-start justify-between gap-6 pt-10 sm:pt-16">
+      <Link to="/" className="group shrink-0">
+        <span className={`block ${label}`}>{site.title}</span>
+        <span className="mt-2 flex items-center gap-2.5 font-mono text-lg">
+          {site.name}
+          <span
+            data-lit
+            suppressHydrationWarning
+            className="relative size-6 shrink-0 overflow-hidden rounded-full border border-fg/45"
+          >
+            <img src={site.avatar} alt="" className="size-full object-cover grayscale" />
+            <img
+              aria-hidden
+              alt=""
+              src={site.avatar}
+              className="lit-mask absolute inset-0 size-full object-cover group-hover:[mask-image:none]"
+            />
+          </span>
         </span>
       </Link>
-      <nav className="flex items-center gap-4 font-mono text-xs text-dim sm:gap-5">
-        <Link to="/" hash="work" className={`${navLink} max-sm:hidden`}>
-          Work
-        </Link>
-        <Link to="/" hash="clients" className={`${navLink} max-sm:hidden`}>
-          Clients
-        </Link>
-        <a href="#contact" className={navLink}>
-          Email
-        </a>
-        <ThemeToggle />
-      </nav>
+      <p className={`text-right ${label}`}>
+        <span className="block">{site.location}</span>
+        <span className="mt-2 block leading-7">
+          <LocalTime />
+        </span>
+      </p>
     </header>
   )
 }
 
-const cairoTime = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' })
+const cairoTime = new Intl.DateTimeFormat('en-GB', {
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  timeZone: 'Africa/Cairo',
+  timeZoneName: 'short',
+})
 
 function LocalTime() {
   const [now, setNow] = useState<Date>()
   useEffect(() => {
     setNow(new Date())
-    const timer = setInterval(() => setNow(new Date()), 30_000)
+    const timer = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
-  return <span>{now ? cairoTime.format(now) : '--:--'} local time</span>
+  return <>{now ? cairoTime.format(now) : '--:--:--'}</>
 }
 
 export function Contact() {
@@ -120,9 +115,7 @@ export function Contact() {
         <span>
           © {new Date().getFullYear()} {site.name}
         </span>
-        <span>
-          {site.location} · <LocalTime />
-        </span>
+        <ThemeToggle />
       </div>
     </footer>
   )
