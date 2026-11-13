@@ -15,7 +15,7 @@ import { DeviceReel } from '../components/Device'
 import { Orbit } from '../components/Orbit'
 import { ThemeToggle } from '../components/Chrome'
 import { Reveal, SectionLabel } from '../components/Reveal'
-import { StatGraphic, WorkThumb } from '../components/Tiles'
+import { Pipeline, Rating, SectionGlyph, StatGraphic, WorkThumb } from '../components/Tiles'
 import { type Project, projects } from '../content/projects'
 import { site, skills, stats, testimonials, upwork } from '../content/site'
 
@@ -267,6 +267,44 @@ function Stat({ stat }: { stat: (typeof stats)[number] }) {
   )
 }
 
+function Skills() {
+  const active = useMotionValue<number | undefined>(undefined)
+  return (
+    <>
+      <Reveal className="mt-5">
+        <Pipeline stations={skills.length} active={active} />
+        <div className="mt-1 grid auto-cols-fr grid-flow-col text-center font-mono text-[10.5px] text-dim max-sm:hidden">
+          {skills.map((group) => (
+            <span key={group.title}>{group.title}</span>
+          ))}
+        </div>
+      </Reveal>
+      <ul
+        className="group/list mt-3"
+        onPointerLeave={(event) => {
+          if (event.pointerType === 'mouse') active.set(undefined)
+        }}
+      >
+        {skills.map((group, index) => (
+          <li key={group.title} onPointerEnter={() => active.set(index)}>
+            <Reveal>
+              <div className={`${row} grid gap-x-4 gap-y-1 py-2 sm:grid-cols-[9.5rem_1fr]`}>
+                <span className="flex items-center gap-2.5 self-start text-sm leading-relaxed text-dim">
+                  <SectionGlyph name={group.glyph} />
+                  {group.title}
+                </span>
+                <span className="text-[15px] leading-relaxed text-soft transition-colors group-hover:text-fg">
+                  {group.items.join(' · ')}
+                </span>
+              </div>
+            </Reveal>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
 function Home() {
   return (
     <>
@@ -306,7 +344,13 @@ function Home() {
           {testimonials.map((quote) => (
             <li key={quote}>
               <Reveal>
-                <blockquote className={`${row} py-3.5 leading-relaxed text-soft hover:text-fg`}>{quote}</blockquote>
+                <figure className={`${row} py-3.5 text-soft hover:text-fg`}>
+                  <figcaption className="mb-2 flex items-center gap-2.5 font-mono text-[11px] text-dim">
+                    <Rating />
+                    5.0 · Upwork
+                  </figcaption>
+                  <blockquote className="leading-relaxed">{quote}</blockquote>
+                </figure>
               </Reveal>
             </li>
           ))}
@@ -315,16 +359,7 @@ function Home() {
 
       <section id="skills" className="pt-16 sm:pt-24">
         <SectionLabel glyph="skills">Skills</SectionLabel>
-        <ul className="mt-5 space-y-4">
-          {skills.map((group) => (
-            <li key={group.title}>
-              <Reveal className="grid gap-x-4 gap-y-1 sm:grid-cols-[8.5rem_1fr]">
-                <span className="text-sm leading-relaxed text-dim">{group.title}</span>
-                <span className="text-[15px] leading-relaxed text-soft">{group.items.join(' · ')}</span>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+        <Skills />
       </section>
 
       <ScrollHint />

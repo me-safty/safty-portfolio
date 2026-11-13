@@ -46,6 +46,35 @@ const envelope = (flap: string): Sprite => [
   '.......',
 ]
 
+const target = (aim: string): Sprite => ['...#...', '.#####.', '.#...#.', `##.${aim}.##`, '.#...#.', '.#####.', '...#...']
+
+const browser = (line: string): Sprite => ['#######', '#+++++#', '#######', '#.....#', `#${line}#`, '#.....#', '#######']
+
+const phone = (alert: string): Sprite => ['.#####.', '.#...#.', `.#.${alert}.#.`, '.#...#.', '.#...#.', '.#.+.#.', '.#####.']
+
+const rack = (busy: number): Sprite =>
+  Array.from({ length: 7 }, (_, row) => (row % 2 === 0 ? '.......' : row === busy ? '#####.#' : '#####.+'))
+
+const branch = (tip: string): Sprite => [
+  `##...${tip}${tip}`,
+  `##...${tip}${tip}`,
+  '#....#.',
+  '#...#..',
+  '####...',
+  '##.....',
+  '##.....',
+]
+
+const spark = (tip: string): Sprite => [
+  `...${tip}...`,
+  '...#...',
+  '..###..',
+  `${tip}#####${tip}`,
+  '..###..',
+  '...#...',
+  `...${tip}...`,
+]
+
 const glyph =
   (frames: Sprite[]) =>
   ({ columns, still, light }: Grid): Scene => ({
@@ -67,6 +96,12 @@ const glyphs = {
   clients: glyph(['.#...', '.#.#.', '.....'].map(bubble)),
   skills: glyph([1, 2, 3, 4].map(blocks)),
   contact: glyph(['#', '+'].map(envelope)),
+  product: glyph(['#', '.'].map(target)),
+  frontend: glyph(['+....', '+++..', '+++++'].map(browser)),
+  mobile: glyph(['.', '#'].map(phone)),
+  backend: glyph([1, 3, 5].map(rack)),
+  platform: glyph(['#', '+'].map(branch)),
+  ai: glyph(['.', '+', '#'].map(spark)),
 }
 
 export type GlyphName = keyof typeof glyphs
@@ -115,6 +150,61 @@ export function StatGraphic({ name, progress }: { name: GraphicName; progress: M
     })
   }, [name, progress])
   return <CellField start={start} className="block h-10 w-[116px] [--cell:4px]" />
+}
+
+function rating({ still, light }: Grid): Scene {
+  return {
+    trail: 0.01,
+    tick({ time }) {
+      for (let star = 0; star < 5; star++) {
+        const since = still ? 1 : time - 0.5 - star * 0.16
+        if (since > 0) stamp(light, STAR, star * 6, 0, Math.max(0.85, 1 - since))
+      }
+    },
+  }
+}
+
+export function Rating() {
+  return <CellField start={rating} className="h-[15px] w-[87px] [--cell:3px]" />
+}
+
+export function Pipeline({ stations, active }: { stations: number; active: MotionValue<number | undefined> }) {
+  const start = useMemo(
+    () =>
+      ({ columns, light }: Grid): Scene => {
+        const centre = (station: number) => Math.floor(((station + 0.5) * columns) / stations)
+        const end = centre(stations - 1)
+        let packets: number[] = []
+        let nextPacket = 0
+        return {
+          tick({ step, time }) {
+            for (let x = centre(0); x <= end; x++) light(x, 4, 0.14)
+            for (let station = 0; station < stations; station++) {
+              const hot = active.get() === station
+              for (let y = 2; y <= 6; y++) {
+                for (let x = -2; x <= 2; x++) {
+                  const edge = Math.abs(x) === 2 || y === 2 || y === 6
+                  light(centre(station) + x, y, hot ? 1 : edge ? 0.5 : 0.18 + Math.sin(time * 2 + station) * 0.1)
+                }
+              }
+            }
+            if (time > nextPacket) {
+              nextPacket = time + 0.9
+              packets.push(centre(0))
+            }
+            packets = packets.map((x) => x + step * 16).filter((x) => x <= end)
+            for (const x of packets) light(x, 4, 1)
+          },
+        }
+      },
+    [stations, active],
+  )
+  return (
+    <CellField
+      start={start}
+      className="block h-[54px] w-full [--cell:6px] sm:h-[72px] sm:[--cell:8px] [mask-image:linear-gradient(90deg,transparent,#000_3%,#000_97%,transparent)]"
+    />
+  )
 }
 
 const SKY = [

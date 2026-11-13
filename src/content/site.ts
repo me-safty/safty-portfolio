@@ -1,4 +1,4 @@
-import type { GraphicName } from '../components/Tiles'
+import type { GlyphName, GraphicName } from '../components/Tiles'
 
 export const upwork = {
   shortRole: 'Freelance developer',
@@ -60,9 +60,10 @@ export const stats: { value: number; decimals: number; suffix: string; graphic: 
   { value: 5, decimals: 1, suffix: '', graphic: 'stars', label: 'Upwork rating, 100% Job Success across 11 jobs' },
 ]
 
-export const skills = [
+export const skills: { title: string; glyph: GlyphName; items: string[] }[] = [
   {
     title: 'Product',
+    glyph: 'product',
     items: [
       'MVP scoping',
       'UX and interaction design',
@@ -74,22 +75,27 @@ export const skills = [
   },
   {
     title: 'Frontend',
+    glyph: 'frontend',
     items: ['React', 'TanStack Start, Router, Query', 'Next.js', 'TypeScript', 'Zustand', 'Tailwind CSS', 'shadcn/ui'],
   },
   {
     title: 'Mobile',
+    glyph: 'mobile',
     items: ['React Native', 'Expo', 'Expo Router', 'EAS Build and Update', 'Push notifications', 'PWA'],
   },
   {
     title: 'Backend',
+    glyph: 'backend',
     items: ['Node.js', 'ts-rest', 'Express/tsoa', 'WebSockets', 'RabbitMQ', 'MongoDB', 'MySQL', 'Supabase', 'Convex'],
   },
   {
     title: 'Platform',
+    glyph: 'platform',
     items: ['pnpm monorepos', 'GitLab CI', 'Docker', 'Helm review environments', 'Jest', 'Vitest', 'Playwright'],
   },
   {
     title: 'AI engineering',
+    glyph: 'ai',
     items: ['Claude Code', 'Codex', 'Agent rules', 'Autonomous fix workers', 'Review and evidence loops'],
   },
 ]
