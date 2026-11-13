@@ -87,7 +87,7 @@ export function Contact() {
   }
 
   return (
-    <footer id="contact" className="pt-16 pb-10 sm:pt-24">
+    <footer id="contact" className="pt-16 sm:pt-24">
       <SectionLabel glyph="contact">Contact</SectionLabel>
       <Reveal>
         <p className="mt-4 text-xl leading-snug text-soft">
@@ -114,9 +114,9 @@ export function Contact() {
         </span>
         <ThemeToggle />
       </div>
-      <Reveal className="-mx-6 mt-10 sm:-mx-12">
+      <div className="-mx-6 mt-10 sm:-mx-12">
         <Wordmark />
-      </Reveal>
+      </div>
     </footer>
   )
 }
