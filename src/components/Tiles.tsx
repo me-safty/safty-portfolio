@@ -7,6 +7,7 @@ type Sprite = string[]
 
 const LEVELS: Record<string, number> = { '#': 1, '+': 0.5 }
 const REST = 0.55
+const CRISP = 1e-4
 
 function stamp(light: Grid['light'], sprite: Sprite, left: number, top: number, gain = 1) {
   sprite.forEach((line, y) => {
@@ -75,18 +76,27 @@ const spark = (tip: string): Sprite => [
   `...${tip}...`,
 ]
 
+const frameAt = (frames: Sprite[], time: number) => frames[Math.floor(time / 1.1) % frames.length] ?? []
+
 const glyph =
   (frames: Sprite[]) =>
   ({ columns, still, light }: Grid): Scene => ({
     tick({ time }) {
       const shown = still ? columns : time / 0.12
-      const frame = frames[Math.floor(time / 1.1) % frames.length] ?? []
       stamp(
         light,
-        frame.map((line) => line.slice(0, shown)),
+        frameAt(frames, time).map((line) => line.slice(0, shown)),
         0,
         0,
       )
+    },
+  })
+
+const icon =
+  (frames: Sprite[]) =>
+  ({ light }: Grid): Scene => ({
+    tick({ time }) {
+      stamp(light, frameAt(frames, time), 0, 0)
     },
   })
 
@@ -96,18 +106,32 @@ const glyphs = {
   clients: glyph(['.#...', '.#.#.', '.....'].map(bubble)),
   skills: glyph([1, 2, 3, 4].map(blocks)),
   contact: glyph(['#', '+'].map(envelope)),
-  product: glyph(['#', '.'].map(target)),
-  frontend: glyph(['+....', '+++..', '+++++'].map(browser)),
-  mobile: glyph(['.', '#'].map(phone)),
-  backend: glyph([1, 3, 5].map(rack)),
-  platform: glyph(['#', '+'].map(branch)),
-  ai: glyph(['.', '+', '#'].map(spark)),
+}
+
+const icons = {
+  product: icon(['#', '.'].map(target)),
+  frontend: icon(['+++++', '+....', '+++..'].map(browser)),
+  mobile: icon(['.', '#'].map(phone)),
+  backend: icon([1, 3, 5].map(rack)),
+  platform: icon(['#', '+'].map(branch)),
+  ai: icon(['#', '+', '.'].map(spark)),
 }
 
 export type GlyphName = keyof typeof glyphs
 
 export function SectionGlyph({ name }: { name: GlyphName }) {
   return <CellField start={glyphs[name]} className="size-[21px] shrink-0 text-fg [--cell:3px]" />
+}
+
+export type IconName = keyof typeof icons
+
+export function SkillIcon({ name }: { name: IconName }) {
+  return (
+    <CellField
+      start={icons[name]}
+      className="size-[21px] shrink-0 [--cell:3px] [--play:0] group-hover:[--play:1]"
+    />
+  )
 }
 
 type Step = { sprite: Sprite; x: number; y: number }
@@ -174,26 +198,24 @@ export function Pipeline({ stations, active }: { stations: number; active: Motio
       ({ columns, light }: Grid): Scene => {
         const centre = (station: number) => Math.floor(((station + 0.5) * columns) / stations)
         const end = centre(stations - 1)
-        let packets: number[] = []
-        let nextPacket = 0
         return {
-          tick({ step, time }) {
+          trail: 0,
+          tick({ time }) {
             for (let x = centre(0); x <= end; x++) light(x, 4, 0.14)
             for (let station = 0; station < stations; station++) {
               const hot = active.get() === station
               for (let y = 2; y <= 6; y++) {
                 for (let x = -2; x <= 2; x++) {
                   const edge = Math.abs(x) === 2 || y === 2 || y === 6
-                  light(centre(station) + x, y, hot ? 1 : edge ? 0.5 : 0.18 + Math.sin(time * 2 + station) * 0.1)
+                  light(centre(station) + x, y, hot ? 1 : edge ? 0.5 : 0.18)
                 }
               }
             }
-            if (time > nextPacket) {
-              nextPacket = time + 0.9
-              packets.push(centre(0))
-            }
-            packets = packets.map((x) => x + step * 16).filter((x) => x <= end)
-            for (const x of packets) light(x, 4, 1)
+            const packet = centre(0) + ((time * 14) % (end - centre(0) + 12))
+            ;[1, 0.45, 0.25].forEach((level, behind) => {
+              const x = packet - behind
+              if (x >= centre(0) && x <= end) light(x, 4, level)
+            })
           },
         }
       },
@@ -216,7 +238,6 @@ const SKY = [
   [4, 5],
 ] as const
 const PLAY = ['#...', '##..', '###.', '####', '###.', '##..', '#...']
-const CRISP = 1e-4
 
 function planet({ light }: Grid): Scene {
   return {

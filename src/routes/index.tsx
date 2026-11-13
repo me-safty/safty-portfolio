@@ -15,7 +15,7 @@ import { DeviceReel } from '../components/Device'
 import { Orbit } from '../components/Orbit'
 import { ThemeToggle } from '../components/Chrome'
 import { Reveal, SectionLabel } from '../components/Reveal'
-import { Pipeline, Rating, SectionGlyph, StatGraphic, WorkThumb } from '../components/Tiles'
+import { Pipeline, Rating, SkillIcon, StatGraphic, WorkThumb } from '../components/Tiles'
 import { type Project, projects } from '../content/projects'
 import { site, skills, stats, testimonials, upwork } from '../content/site'
 
@@ -273,11 +273,6 @@ function Skills() {
     <>
       <Reveal className="mt-5">
         <Pipeline stations={skills.length} active={active} />
-        <div className="mt-1 grid auto-cols-fr grid-flow-col text-center font-mono text-[10.5px] text-dim max-sm:hidden">
-          {skills.map((group) => (
-            <span key={group.title}>{group.title}</span>
-          ))}
-        </div>
       </Reveal>
       <ul
         className="group/list mt-3"
@@ -288,9 +283,9 @@ function Skills() {
         {skills.map((group, index) => (
           <li key={group.title} onPointerEnter={() => active.set(index)}>
             <Reveal>
-              <div className={`${row} grid gap-x-4 gap-y-1 py-2 sm:grid-cols-[9.5rem_1fr]`}>
-                <span className="flex items-center gap-2.5 self-start text-sm leading-relaxed text-dim">
-                  <SectionGlyph name={group.glyph} />
+              <div className={`${row} grid gap-x-4 gap-y-1 py-2 sm:grid-cols-[8.5rem_1fr]`}>
+                <span className="flex items-center gap-2.5 self-start text-sm leading-relaxed text-dim transition-colors group-hover:text-fg">
+                  <SkillIcon name={group.icon} />
                   {group.title}
                 </span>
                 <span className="text-[15px] leading-relaxed text-soft transition-colors group-hover:text-fg">
