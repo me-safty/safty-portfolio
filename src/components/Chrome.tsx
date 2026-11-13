@@ -29,7 +29,7 @@ export function ThemeToggle() {
 
 export function Header() {
   return (
-    <header className="flex items-start justify-between gap-6 pt-10 sm:pt-16">
+    <header className="flex items-start justify-between gap-6 pt-10 sm:pt-[clamp(4rem,18vh,11rem)]">
       <Link to="/" className="group shrink-0">
         <span className={`block ${label}`}>{site.title}</span>
         <span className="mt-2 flex items-center gap-2.5 font-mono text-lg">
