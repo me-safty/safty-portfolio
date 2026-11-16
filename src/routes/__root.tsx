@@ -43,7 +43,6 @@ function Shell({ children }: { children: ReactNode }) {
         <MotionConfig reducedMotion="user">
           <Spotlight />
           <div className="mx-auto min-h-svh max-w-[736px] bg-bg px-6 transition-colors duration-300 sm:px-12">
-            <Header />
             <main>{children}</main>
             <Contact />
           </div>
@@ -56,12 +55,15 @@ function Shell({ children }: { children: ReactNode }) {
 
 function NotFound() {
   return (
-    <div className="py-32">
-      <p className="font-mono text-[11px] tracking-[0.2em] text-dim uppercase">404</p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-[-0.04em]">This page does not exist.</h1>
-      <Link to="/" className="link mt-6 inline-block font-mono text-xs">
-        ← Back home
-      </Link>
-    </div>
+    <>
+      <Header />
+      <div className="py-32">
+        <p className="font-mono text-[11px] tracking-[0.2em] text-dim uppercase">404</p>
+        <h1 className="mt-4 text-4xl font-semibold tracking-[-0.04em]">This page does not exist.</h1>
+        <Link to="/" className="link mt-6 inline-block font-mono text-xs">
+          ← Back home
+        </Link>
+      </div>
+    </>
   )
 }

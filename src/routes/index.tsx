@@ -13,7 +13,7 @@ import {
 import { type PointerEvent, type ReactNode, useEffect, useRef, useState } from 'react'
 import { DeviceReel } from '../components/Device'
 import { Orbit } from '../components/Orbit'
-import { ThemeToggle } from '../components/Chrome'
+import { Header, ThemeToggle } from '../components/Chrome'
 import { Reveal, SectionLabel } from '../components/Reveal'
 import { Pipeline, Rating, SkillIcon, StatGraphic, WorkThumb } from '../components/Tiles'
 import { type Project, projects } from '../content/projects'
@@ -303,9 +303,12 @@ function Skills() {
 function Home() {
   return (
     <>
-      <section className="pt-10 sm:pt-12">
-        <Bio />
-      </section>
+      <div className="flex min-h-svh flex-col justify-center pb-10">
+        <Header />
+        <section className="pt-10 sm:pt-12">
+          <Bio />
+        </section>
+      </div>
 
       <section id="work" className="pt-16 sm:pt-24">
         <SectionLabel glyph="work">Work</SectionLabel>
